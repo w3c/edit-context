@@ -91,7 +91,7 @@
             <ol>
               <li>Instead of deriving the contents of the [=Text Edit Context=] from the DOM, it will be taken from the {{EditContext.text}} property.</li>
               <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use the offsets from the {{EditContext.selectionStart}} and {{EditContext.selectionEnd}} properties.</li>
-              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the {{EditContext.selectionBound}}, {{EditContext.characterBounds}} and {{EditContext.controlBound}} will be used.</li>
+              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the {{EditContext.selectionBounds}}, {{EditContext.characterBounds}} and {{EditContext.controlBounds}} will be used.</li>
             </ol>
 
             <p>Using an EditContext, an author can mark a region of the document editable by associating an EditContext object with an element as shown in the example below: </p>
@@ -159,13 +159,13 @@
             this.editContext.updateText(0, this.model.text.length, this.model.text)
             this.editContext.updateSelection(this.model.selectionStart, this.model.selectionEnd)
 
-            let selectionBound = view.computeSelectionBound()  
-            let controlBound = view.computeControlBound()  
+            let selectionBounds = view.computeSelectionBound()  
+            let controlBounds = view.computeControlBound()  
 
             // These bounds have x, y, width and height members  
             // so they can be assigned directly to EditContext.
-            editContext.updateSelectionBound(selectionBound)
-            editContext.updateControlBound(controlBound)
+            editContext.updateSelectionBounds(selectionBounds)
+            editContext.updateControlBoundss(controlBounds)
         }
     }
 
@@ -564,8 +564,8 @@ interface EditContext : EventTarget {
     undefined updateText(unsigned long rangeStart, unsigned long rangeEnd,
         DOMString text);
     undefined updateSelection(unsigned long start, unsigned long end);
-    undefined updateControlBound(DOMRect controlBound);
-    undefined updateSelectionBound(DOMRect selectionBound);
+    undefined updateControlBounds(DOMRect controlBounds);
+    undefined updateSelectionBounds(DOMRect selectionBounds);
     undefined updateCharacterBounds(unsigned long rangeStart, sequence<DOMRect> characterBounds);
 
     sequence<Element> attachedElements();
@@ -576,8 +576,8 @@ interface EditContext : EventTarget {
     readonly attribute unsigned long compositionRangeStart;
     readonly attribute unsigned long compositionRangeEnd;
     readonly attribute boolean isInComposition;
-    readonly attribute DOMRect controlBound;
-    readonly attribute DOMRect selectionBound;
+    readonly attribute DOMRect controlBounds;
+    readonly attribute DOMRect selectionBounds;
     readonly attribute unsigned long characterBoundsRangeStart;
     sequence<DOMRect> characterBounds();
 
@@ -606,14 +606,14 @@ interface EditContext : EventTarget {
             <dt><dfn>isInComposition</dfn>, of type {{boolean}}</dt>
             <dd>Initially false. Whether there is an active composition.</dd>
 
-            <dt><dfn>controlBound</dfn>, of type {{DOMRect}}</dt>
+            <dt><dfn>controlBounds</dfn>, of type {{DOMRect}}</dt>
             <dd>Initially 0s. The bounding box of the display surface where the text is rendered. The offset of the rectangle is expressed relative to the origin of the associated element.</dd>
 
 <p class="note">
     The control bound may be used by the OS for hittesting to trigger the virtual keyboard.
 </p>
 
-            <dt><dfn>selectionBound</dfn>, of type {{DOMRect}}</dt>
+            <dt><dfn>selectionBounds</dfn>, of type {{DOMRect}}</dt>
             <dd>Initially 0s. The bounding box of the selection. The offset of the rectangle is expressed relative to the origin of the associated element. If the selection is collapsed, this is the bounding box of the caret.</dd>
 
             <dt><dfn>characterBoundsRangeStart</dfn>, of type {{unsigned long}}</dt>
@@ -658,7 +658,7 @@ interface EditContext : EventTarget {
                 </ol>
             </dd>
             <dt>
-                <dfn>updateSelectionBound()</dfn> method
+                <dfn>updateSelectionBounds()</dfn> method
             </dt>
               <dd>
                 <p>
@@ -669,12 +669,12 @@ interface EditContext : EventTarget {
                     If the EditContext is not activated, abort these steps.
                   </li>
                   <li>
-                    set {{EditContext/selectionBound}} to <i>selectoinBound</i>.
+                    set {{EditContext/selectionBounds}} to <i>selectoinBound</i>.
                   </li>
                 </ol>
               </dd>
               <dt>
-                <dfn>updateControlBound()</dfn> method
+                <dfn>updateControlBounds()</dfn> method
             </dt>
               <dd>
                 <p>
@@ -685,7 +685,7 @@ interface EditContext : EventTarget {
                     If the EditContext is not activated, abort these steps.
                   </li>
                   <li>
-                    set {{EditContext/controlBound}} to <i>controlBound</i>.
+                    set {{EditContext/controlBounds}} to <i>controlBounds</i>.
                   </li>
                 </ol>
               </dd>
@@ -899,7 +899,7 @@ interface CharacterBoundsUpdateEvent : Event {
             <p>
                 <ul>
                     <li>
-                        User Agent MUST only allow {{EditContext/updateSelection()}}, {{EditContext/updateText()}}, {{EditContext/updateSelectionBound()}}, {{EditContext/updateControlBound()}}, and {{EditContext/updateCharacterBounds()}} methods to be called in a <a href="https://w3c.github.io/webappsec-secure-contexts/">Secure Context</a>.
+                        User Agent MUST only allow {{EditContext/updateSelection()}}, {{EditContext/updateText()}}, {{EditContext/updateSelectionBounds()}}, {{EditContext/updateControlBounds()}}, and {{EditContext/updateCharacterBounds()}} methods to be called in a <a href="https://w3c.github.io/webappsec-secure-contexts/">Secure Context</a>.
                     </li>
                 </ul>
             </p>
