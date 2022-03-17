@@ -753,7 +753,7 @@ interface EditContext : EventTarget {
         <h2>EditContext events</h2>
         <section>
             <h3><dfn>TextUpdateEvent</dfn></h3>
-            <pre class="idl"><xmp>dictionary TextUpdateEventInit {
+            <pre class="idl"><xmp>dictionary TextUpdateEventInit : EventInit {
     unsigned long updateRangeStart;
     unsigned long updateRangeEnd;
     DOMString text;
@@ -765,7 +765,7 @@ interface EditContext : EventTarget {
 
 [Exposed=Window]
 interface TextUpdateEvent : Event {
-    constructor(optional TextUpdateEventInit options = {});
+    constructor(DOMString type, optional TextUpdateEventInit options = {});
     readonly attribute unsigned long updateRangeStart;
     readonly attribute unsigned long updateRangeEnd;
     readonly attribute DOMString text;
@@ -799,7 +799,7 @@ interface TextUpdateEvent : Event {
         </section>
         <section>
             <h3><dfn>TextFormatUpdateEvent</dfn></h3>
-            <pre class="idl"><xmp>dictionary TextFormatInit {
+            <pre class="idl"><xmp>dictionary TextFormatInit : EventInit {
     unsigned long rangeStart;
     unsigned long rangeEnd;
     DOMString textColor;
@@ -811,7 +811,7 @@ interface TextUpdateEvent : Event {
 
 [Exposed=Window]
 interface TextFormat {
-    constructor(optional TextFormatInit options = {});
+    constructor(DOMString type, optional TextFormatInit options = {});
     attribute unsigned long rangeStart;
     attribute unsigned long rangeEnd;
     attribute DOMString textColor;
@@ -821,14 +821,13 @@ interface TextFormat {
     attribute DOMString underlineColor;
 };
 
-dictionary TextFormatUpdateEventInit {
+dictionary TextFormatUpdateEventInit : EventInit {
     sequence<TextFormat> textFormats;
 };
 
 [Exposed=Window]
 interface TextFormatUpdateEvent : Event {
-    constructor(optional TextFormatUpdateEventInit options = {});
-
+    constructor(DOMString type, optional TextFormatUpdateEventInit options = {});
     sequence<TextFormat> getTextFormats();
 };</xmp></pre>
             <dl>
@@ -869,15 +868,14 @@ interface TextFormatUpdateEvent : Event {
         </section>
         <section>
             <h3><dfn>CharacterBoundsUpdateEvent</dfn></h3>
-            <pre class="idl"><xmp>dictionary CharacterBoundsUpdateEventInit {
+            <pre class="idl"><xmp>dictionary CharacterBoundsUpdateEventInit : EventInit {
     unsigned long rangeStart;
     unsigned long rangeEnd;
 };
 
 [Exposed=Window]
 interface CharacterBoundsUpdateEvent : Event {
-    constructor(optional CharacterBoundsUpdateEventInit options = {});
-
+    constructor(DOMString type, optional CharacterBoundsUpdateEventInit options = {});
     readonly attribute unsigned long rangeStart;
     readonly attribute unsigned long rangeEnd;
 };</xmp></pre>
