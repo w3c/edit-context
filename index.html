@@ -89,16 +89,21 @@
         </section>
         <section id="editcontext-model">
             <h3>The EditContext Model</h3>
-            <p>An {{EditContext}} is a JavaScript projection of the [=Text Edit Context=] concept discussed in the previous section. Using an {{EditContext}}, an author can mark a region of the document editable by associating an instance of an {{EditContext}} with an element.</p>
             
-            <p>Associating an {{EditContext}} to an element makes that element intrinsically focusable.  When the element is focused, the user agent will use the state of the {{EditContext}} to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
+            <p>An <dfn>edit context</dfn> is a conceptual object that can be used by the user agent to contruct a [=Text Edit Context=] for the [=Text Input Service=] of the OS.</p>
+            
+            <p>An [=edit context=] has a <dfn>text</dfn> that consists of the plain text of the editable content, a <dfn>selection range</dfn> that marks the start and the end of the current selection, a <dfn>composition range</dfn> that marks the start and the end of the current composition, <dfn>control bounds</dfn> that indicates the bounding box of the display surface, <dfn>selection bounds</dfn> that indicates the bounding box of the selection, <dfn>character bounds</dfn> that indicates the bounding boxes of an array of characters of which the bounding boxes are needed for the [=Text Input Service=] of the OS, and a <dfn>character bounds range start index</dfn> that indicates the index of the first character that is used for the [=character bounds=].
+            
+            <p>An {{EditContext}} is a JavaScript projection of [=edit context=]. Using an {{EditContext}}, an author can mark a region of the document editable by associating an instance of an {{EditContext}} with an element.</p>
+            
+            <p>Associating an {{EditContext}} to an element makes that element intrinsically [=focusable=].  When the element is focused, the user agent will use the state of the [=edit context=] to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
             <ol>
-              <li>Instead of deriving the contents of the [=Text Edit Context=] from the DOM, it will be taken from the {{EditContext.text}} property.</li>
-              <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use the offsets from the {{EditContext.selectionStart}} and {{EditContext.selectionEnd}} properties.</li>
-              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the {{EditContext.selectionBounds}}, {{EditContext.characterBounds}} and {{EditContext.controlBounds}} will be used.</li>
+              <li>Instead of deriving the text content of the [=Text Edit Context=] from the DOM, it will be taken from [=edit context=]'s [=text=].</li>
+              <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use [=edit context=]'s [=selection range=].</li>
+              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the user agent will use [=edit context=]'s [=selection bounds=], [=character bounds=], and [=control bounds=] respectively.</li>
             </ol>
 
-            <p>Using an EditContext, an author can mark a region of the document editable by associating an EditContext object with an element as shown in the example below: </p>
+            <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
                 <pre><xmp><script type="module"> 
     let canvas = document.querySelector("canvas") 
@@ -447,7 +452,7 @@
         </pre>
         <dfn>editContext</dfn>
         <p>
-            An {{EditContext}}, initially null.
+            An {{EditContext}}, initially null. The {{EditContext}} getter steps are to return [=this=]'s [=editcontext=] object.
         </p>
 
         <p>When an element is associated with an {{EditContext}}, it is focusable regardless of whether its contentediable attribute is true or not.</p>
@@ -554,7 +559,8 @@
     </section>
 
     <section data-dfn-for="EditContext">
-        <h2>The <dfn>EditContext</dfn> Interface</h2>
+        <h2>EditContext API</h2>
+        <h3 id="editcontext-interface">EditContext Interface</h3>
     <pre class="idl"><xmp>dictionary EditContextInit {
     DOMString text;
     unsigned long selectionStart;
