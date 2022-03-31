@@ -90,13 +90,19 @@
         <section id="editcontext-model">
             <h3>The EditContext Model</h3>
             
-            <p>An <dfn>edit context</dfn> is a conceptual object that can be used by the user agent to contruct a [=Text Edit Context=] for the [=Text Input Service=] of the OS.</p>
-            
-            <p>An [=edit context=] has a <dfn>text</dfn> that consists of the plain text of the editable content, a <dfn>selection range</dfn> that marks the start and the end of the current selection, a <dfn>composition range</dfn> that marks the start and the end of the current composition, <dfn>control bounds</dfn> that indicates the bounding box of the display surface, <dfn>selection bounds</dfn> that indicates the bounding box of the selection, <dfn>character bounds</dfn> that indicates the bounding boxes of an array of characters of which the bounding boxes are needed for the [=Text Input Service=] of the OS, and a <dfn>character bounds range start</dfn> index that indicates the index of the first character that is used for the [=character bounds=].
-            
-            <p>An {{EditContext}} is a JavaScript projection of [=edit context=]. Using an {{EditContext}}, an author can mark a region of the document editable by associating an instance of an {{EditContext}} with an element.</p>
-            
-            <p>Associating an {{EditContext}} to an element makes that element intrinsically [=focusable=].  When the element is focused, the user agent will use the state of the [=edit context=] to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
+            <p>An {{EditContext}} has a [=text=], a [=selection start=] position, a [=selection end=] position, a [=composition start=] position,  a [=composition end=] position, a [=is composing=] flag, a [=control bounds=], a [=selection bounds=], an [=array of character bounds=] and a [=character bounds range start=] index.
+            <p>The <dfn>text</dfn> consists of the plain text of the editable content. The initial value is the empty string.</p>
+            <p>The <dfn>selection start</dfn> position is the start position of the current selection. The initial value is 0.</p>
+            <p>The <dfn>selection end</dfn> position is the end position of the current selection. The initial value is 0.</p>
+            <p>The <dfn>composition start</dfn> position is the start of the current composition. The initial value is 0</p>
+            <p>The <dfn>composition end</dfn> position is the end of the current composition. The initial value is 0</p>
+            <p>The <dfn>is composing</dfn> flag indicates if there is an active composition. The initial value is false</p>
+            <p>The <dfn>control bounds</dfn> is the bounding box of the display surface. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, and 0, respectively.</p>
+            <p>The <dfn>selection bounds</dfn> is the bounding box of the selection. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, 0, respectively.</p>
+            <p>The <dfn>array of character bounds</dfn> consists of the bounding boxes of the rendering result of the characters in a substring of [=text=]. These bounding boxes are used by the [=Text Input Method=] to properly position its user interface. The bounding boxes are in [=client coordinate=] and the array is initially empty.</p>
+            <p>The <dfn>character bounds range start</dfn> index is the index in the [=text=] for the first character of the [=array of character bounds=]. The inital value is 0.</p>
+
+            <p>Associating an {{EditContext}} to an element makes that element intrinsically [=focusable=].  When the element is focused, the user agent will use the state of the {{EditContext}} to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
             <ol>
               <li>Instead of deriving the text content of the [=Text Edit Context=] from the DOM, it will be taken from [=edit context=]'s [=text=].</li>
               <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use [=edit context=]'s [=selection range=].</li>
@@ -456,58 +462,239 @@
                };
             </pre>
             <dl>
-                <dt>editContext, of type {{EditContext}}</dt>
-                <dd>initially null. The {{HTMLElement/editContext}} getter steps are to return [=this=]'s [=edit context=].</dd>
+                <dt>editContext</dt>
+                <dd>Initially null. The {{HTMLElement/editContext}} getter steps are to return [=this=]'s {{EditContext}} if there is an {{EditContext}} associated.</dd>
+                <dd>The {{HTMLElement/editContext}} setter must follow these steps:
+                    <div class="algorithm">
+                        <dl>
+                            <dt>Input</dt>
+                            <dd>|editContext|</dd>
+                            <dt>Output</dt>
+                            <dd>None</dd>
+                        </dl>
+                    <ol>
+                    <li>If |editContext| is null
+                        <ol>
+                            <li>run [=Detach EditContext=]</li>
+                        </ol>
+                    </li>
+                    <li>Else
+                        <ol>
+                            <li>run [=Attach EditContext=]</li>
+                        </ol>
+                    </li>                    
+                    </ol>
+                    </div><!-- algorithm -->                    
             </dl>
    
-            <p>When an element is associated with an {{EditContext}}, it is focusable regardless of whether its [=contentediable=] attribute is true or not.</p>
+            <p>When an element is associated with an {{EditContext}}, it is [=editable=] regardless of whether its [=contentediable=] attribute is true or not.</p>
     
-            <p>An element's [=edit context=] is [=activated=] when the element is focused and deactivated when the associated element is blurred.</p>
+            <p>An element's {{EditContext}} is [=activated=] when the element is [=focused=], and deactivated when the associated element is [=blurred=].</p>
     
-            <p>When an [=edit context=] is activated, the user agent MUST NOT modify the DOM when there is [=user text input=], instead, below steps should be implemented:</p>
-    
-            <p>If in a [=composition=]: </p>
+            <p>When an {{EditContext}} is [=activated=], the user agent must not modify the DOM when there is user text input from the [=Text Input Service=], instead, the user agent must run [=Update the composition=] if the text input is a composition, and [=Update the text=] if the text input is not a composition.</p>
+
+            <p>When an {{EditContext}} is [=activated=], the user agent must [=Update Text Input Service=] with the current state of the activated {{EditContext}} at least once every frame.</p>
+
+            <p>When an {{EditContext}} is [=activated=], the user agent must [=Modify BeforeInput Event=]'s behavior and must not fire any [=InputEvent=] when there is user text input from the [=Text Input Service=].</p>
+
+            <p>When an element with an associated {{EditContext}} is connected to the tree, the user agent must run [=Connect Element=].</p>
+
+            <p>When an element with an associated {{EditContext}} is disconnected from the tree, the user agent must run [=Disconnect Element=].</p>
+
+                <h4><dfn>Update the composition</dfn></h4>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|newText|, a string</dd>
+                        <dd>|textSpans|, a structure that has text format info</dd>
+                        <dd>|newSelectionStart|, the new position for the start of the selection</dd>
+                        <dd>|newSelectionEnd|, the new position for the end of the selection</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
             <ol>
                 <li>
-                    [=Fire an event=] named "beforeinput", if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
+                    If |newText| is not empty and [=is composing=] is false
+                    <ol>
+                        <li>[=Fire an event=] named "compositionstart" at the activated {{EditContext}}.
+                        </li>
+                        <li>set [=is composing=] to true</li>
+                    </ol>
                 </li>
                 <li>
-                    Update [=text=], [=selection range=], [=composition range=] of the activated [=edit context=] according to the [=Text Input Service=] of the OS.
+                    If |newText| is empty and [=is composing=] is false
+                    <ol>
+                        <li>Return</li>
+                    </ol>
                 </li>
                 <li>
-                    [=Fire an event=] named "compositionstart" at the activated [=edit context=] if it's a [=start of a composition=].
+                    If [=composition start=] is 0 and [=composition end=] is 0
+                    <ol>
+                        <li>Set [=composition start=] to |newSelectionStart|</li>
+                        <li>Set [=composition end=] to |newSelectionEnd|</li>
+                    </ol>
                 </li>
                 <li>
-                    [=Fire an event=] named "textupdate" at the activated [=edit context=].
+                    Replace the substring of [=text=] in the range of [=composition start=] and [=composition end=] with |newText|
                 </li>
-                <li>
-                    [=Fire an event=] named "textformateupdate" at the activated [=edit context=].
-                </li>
-                <li>
-                    [=Fire an event=] named "characterboundsupdate" at the activated [=edit context=].
-                </li>
-                <li>
-                    [=Fire an event=] named "compositionend" at the activated [=edit context=] if it's an [=end of a composition=].
-                </li>
+                <li>Set [=selection start=] to |newSelectionStart|</li>
+                <li>Set [=selection end=] to |newSelectionEnd|</li>
+                <li>[=Dispatch text update event=] with |newText|</li>
+                <li>Set [=composition end=] to [=composition start=] plus the length of |newText|</li>
+                <li>[=Dispatch text format update event=] with |textSpans|</li>
+                <li>[=Dispatch character bound update event=]</li>
             </ol>
-            <p>If not in a composition: </p>
-            <ol>
-                <li>
-                    [=Fire an event=] named "beforeinput", if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
-                </li>
-                <li>
-                    Update [=text=], [=selection range=] of the activated [=edit context=] according to the user text input.
-                </li>
-                <li>
-                    [=Fire an event=] named "textupdate" at the activated EditContext.
-                </li>
-                <li>
-                    [=Fire an event=] named "characterboundsupdate" at the activated EditContext.
-                </li>
-            </ol>
-            <p>
-                An [=edit context=] can be associated with multiple elements but only the element that has focus will receive beforeinput events.
-            </p>
+            </div><!-- algorithm -->
+
+            <h4><dfn>Update the text</dfn></h4>
+            <div class="algorithm">
+                <dl>
+                    <dt>Input</dt>
+                    <dd>|newText|, a string</dd>
+                    <dt>Output</dt>
+                    <dd>None</dd>
+                </dl>
+
+                <ol>
+                    <li>
+                        Replace the substring of [=text=] in the range of [=selection start=] and [=selection end=] with |newText|
+                    </li>
+                    <li>Set [=selection start=] to [=selection start=] plus the length of |newText|</li>
+                    <li>Set [=selection end=] to [=selection start=]</li>
+                    <li>[=Dispatch text update event=] with |newText|</li>
+                </ol>
+            </div>
+
+            <h4><dfn>Dispatch text update event</dfn></h4>
+        <div class="algorithm">
+            <dl>
+                <dt>Input</dt>
+                <dd>|newText|, a string</dd>
+                <dt>Output</dt>
+                <dd>None</dd>
+            </dl>
+    <ol>
+        <li>
+            Let |event| be a new {{TextUpdateEvent}} with |newText|, [=composition start=], [=composition end=], [=selection start=], and [=selection end=]
+        </li>
+        <li> [=Fire an event=] named "textupdate" with |event|</li>
+    </ol>
+    </div><!-- algorithm -->
+
+    <h4><dfn>Dispatch text format update event</dfn></h4>
+    <div class="algorithm">
+        <dl>
+            <dt>Input</dt>
+            <dd>|textSpans|, a structure that has text format info</dd>
+            <dt>Output</dt>
+            <dd>None</dd>
+        </dl>
+<ol>
+    <li>
+        Let |event| be a new {{TextFormatUpdateEvent}} with |textSpans|
+    </li>
+    <li> [=Fire an event=] named "textformateupdate" with |event|</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Dispatch character bound update event</dfn></h4>
+<div class="algorithm">
+    <dl>
+        <dt>Input</dt>
+        <dd>None</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+<ol>
+<li>
+    Let |event| be a new {{CharacterBoundsUpdateEvent}} with [=composition start=] and [=composition end=]
+</li>
+<li> [=Fire an event=] named "characterboundsupdate" with |event|</li>
+</ol>
+</div><!-- algorithm -->
+<h4><dfn>Update Text Input Service</dfn></h4>
+<div class="algorithm">
+    <dl>
+        <dt>Input</dt>
+        <dd>None</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+<h4><dfn>Modify BeforeInput Event</dfn></h4>
+<div class="algorithm">
+    <dl>
+        <dt>Input</dt>
+        <dd>None</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>focused</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>blurred</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Connect Element</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Disconnect Element</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Attach EditContext</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Detach EditContext</dfn></h4>
+<div class="algorithm">
+<ol>
+<li>
+    <div class="note">Add details</div>
+</li>
+</ol>
+</div><!-- algorithm -->
+
         </section>
         <h3 id="editcontext-interface">EditContext Interface</h3>
     <pre class="idl"><xmp>dictionary EditContextInit {
@@ -534,7 +721,7 @@ interface EditContext : EventTarget {
     readonly attribute unsigned long selectionEnd;
     readonly attribute unsigned long compositionRangeStart;
     readonly attribute unsigned long compositionRangeEnd;
-    readonly attribute boolean isInComposition;
+    readonly attribute boolean isComposing;
     readonly attribute DOMRect controlBounds;
     readonly attribute DOMRect selectionBounds;
     readonly attribute unsigned long characterBoundsRangeStart;
@@ -548,120 +735,165 @@ interface EditContext : EventTarget {
 };</xmp></pre>
         <dl>
             <dt>text</dt>
-            <dd>The {{EditContext/text}} getter steps are to return [=this=]'s [=edit context=]'s [=text=].</dd>
+            <dd>The {{EditContext/text}} getter steps are to return [=this=]'s [=text=].</dd>
 
             <dt>selectionStart</dt>
-            <dd>The {{EditContext/selectionStart}} getter steps are to return the index of the start of [=this=]'s [=edit context=]'s [=selection range=].</dd>
+            <dd>The {{EditContext/selectionStart}} getter steps are to return [=this=]'s [=selection start=].</dd>
 
             <dt>selectionEnd</dt>
-            <dd>The {{EditContext/selectionEnd}} getter steps are to return the index of the end of [=this=]'s [=edit context=]'s [=selection range=].</dd>
+            <dd>The {{EditContext/selectionEnd}} getter steps are to return [=this=]'s [=selection end=].</dd>
 
             <dt>compositionRangeStart</dt>
-            <dd>The {{EditContext/compositionRangeStart}} getter steps are to return the index of the start of [=this=]'s [=edit context=]'s [=composition range=].</dd>
+            <dd>The {{EditContext/compositionRangeStart}} getter steps are to return [=this=]'s [=composition start=].</dd>
 
             <dt>compositionRangeEnd</dt>
-            <dd>The {{EditContext/compositionRangeEnd}} getter steps are to return the index of the end of [=this=]'s [=edit context=]'s [=composition range=].</dd>
+            <dd>The {{EditContext/compositionRangeEnd}} getter steps are to return [=this=]'s [=composition end=].</dd>
 
-            <dt>isInComposition</dt>
-            <dd>The {{EditContext/isInComposition}} getter steps are to return there is an active composition.</dd>
+            <dt>isComposing</dt>
+            <dd>The {{EditContext/isComposing}} getter steps are to return [=this=]'s [=is composing=].</dd>
 
             <dt>controlBounds</dt>
-            <dd>The {{EditContext/compositionRangeEnd}} getter steps are to return [=this=]'s [=edit context=]'s [=control bounds=].</dd>
+            <dd>The {{EditContext/controlBounds}} getter steps are to return [=this=]'s [=control bounds=].</dd>
 
 <p class="note">
     The control bound may be used by the OS for hittesting to trigger the virtual keyboard.
 </p>
 
             <dt>selectionBounds</dt>
-            <dd>The {{EditContext/selectionBounds}} getter steps are to return [=this=]'s [=edit context=]'s [=selection bounds=].</dd>
+            <dd>The {{EditContext/selectionBounds}} getter steps are to return [=this=]'s [=selection bounds=].</dd>
 
             <dt>characterBounds</dt>
-            <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=edit context=]'s [=character bounds=].</dd>
+            <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=array of character bounds=].</dd>
 
             <dt>characterBoundsRangeStart</dt>
-            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=character bounds range start=]'s [=character bounds=].</dd>
+            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=character bounds range start=].</dd>
 
+            <dt>updateText() method</dt>
+            <dd>
+              <p>
+                The method must follow these steps:
+              </p>
+              <div class="algorithm">
+                <dl>
+                    <dt>Input</dt>
+                    <dd>|rangeStart|, an unsigned long</dd>
+                    <dd>|rangeEnd|, an unsigned long</dd>
+                    <dd>|newText|, a DOMString</dd>
+                    <dt>Output</dt>
+                    <dd>None</dd>
+                </dl>
+                <ol>
+                    <li>
+                        If [=this=] is not activated, abort these steps.
+                    </li>
+                    <li>
+                        Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|
+                    </li>
+                    <li>
+                        <div class="note">Add details regarding rangeStart/rangeEnd vs. [=selection start=]/[=selection end=]</div>
+                    </li>
+                </ol>
+            </div>
+            </dd>
             <dt>updateSelection() method</dt>
             <dd>
                 <p>
                   The method must follow these steps:
                 </p>
-                <ol>
-                  <li>
-                    If the EditContext is not activated, abort these steps.
-                  </li>
-                  <li>
-                    If start > end, abort these steps.
-                  </li>
-                  <li>
-                    set the start of the [=selection range=] to <i>start</i>
-                  </li>
-                  <li>
-                    set the end of the [=selection range=] to <i>end</i>
-                  </li>
-                </ol>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|start|, an unsigned long</dd>
+                        <dd>|end|, an unsigned long</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
+                    <ol>
+                        <li>
+                            If [=this=] is not activated, abort these steps.
+                        </li>
+                        <li>
+                            If |start| > |end|, abort these steps.
+                        </li>
+                        <li>
+                            set [=selection start=] to |start|
+                        </li>
+                        <li>
+                            set [=selection end=] to |end|
+                        </li>
+                    </ol>
+                </div>
             </dd>
             <dt>updateSelectionBounds() method</dt>
               <dd>
                 <p>
                   The method must follow these steps:
                 </p>
-                <ol>
-                  <li>
-                    If the [=edit context=] is not activated, abort these steps.
-                  </li>
-                  <li>
-                    set [=selection bounds=] to <i>selectoinBound</i>.
-                  </li>
-                </ol>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|selectionBounds|, a [=DOMRect=]</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
+                    <ol>
+                        <li>
+                            If [=this=] is not activated, abort these steps.
+                        </li>
+                        <li>
+                            set [=selection bounds=] to |selectionBounds|
+                        </li>
+                    </ol>
+                </div>
               </dd>
               <dt>updateControlBounds() method</dt>
               <dd>
                 <p>
                   The method must follow these steps:
                 </p>
-                <ol>
-                  <li>
-                    If the [=edit context=] is not activated, abort these steps.
-                  </li>
-                  <li>
-                    set [=control bounds=] to <i>controlBounds</i>.
-                  </li>
-                </ol>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|controlBounds|, a [=DOMRect=]</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
+                    <ol>
+                        <li>
+                            If [=this=] is not activated, abort these steps.
+                        </li>
+                        <li>
+                            set [=control bounds=] to |controlBounds|
+                        </li>
+                    </ol>
+                </div>
               </dd>
               <dt>updateCharacterBounds() method</dt>
               <dd>
                 <p>
                   The method must follow these steps:
                 </p>
-                <ol>
-                  <li>
-                    If the EditContext is not activated, abort these steps.
-                  </li>
-                  <li>
-                    Set the [=character bounds range start=] index to <i>rangeStart</i>.
-                  </li>
-                  <li>
-                    Set [=character bounds=] to <i>characterBounds</i>.
-                  </li>
-                </ol>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|rangeStart|, an unsigned long</dd>
+                        <dd>|characterBounds|, an array of [=DOMRect=]</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
+                    <ol>
+                        <li>
+                            If [=this=] is not activated, abort these steps.
+                        </li>
+                        <li>
+                            set [=character bounds range start=] to |rangeStart|.
+                        </li>
+                        <li>
+                            set [=control bounds=] to |controlBounds|.
+                        </li>
+                    </ol>
+                </div>
               </dd>
-
-            <dt>updateText() method</dt>
-              <dd>
-                <p>
-                  The method must follow these steps:
-                </p>
-                <ol>
-                  <li>
-                    If the EditContext is not activated, abort these steps.
-                  </li>
-                  <li>
-                    Replace the string in the range of <i>rangeStart</i> and <i>rangeEnd</i> of {{EditContext/text}} with <i>text</i>.
-                  </li>
-                </ol>
-              </dd>
-
             <dt>attachedElements() method</dt>
             <dd><p>The method returns elements that are associated with the EditContext.</p></dd>
             <p class="issue">
