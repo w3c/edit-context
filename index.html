@@ -104,9 +104,9 @@
 
             <p>Associating an {{EditContext}} to an element makes that element intrinsically [=focusable=].  When the element is focused, the user agent will use the state of the {{EditContext}} to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
             <ol>
-              <li>Instead of deriving the text content of the [=Text Edit Context=] from the DOM, it will be taken from [=edit context=]'s [=text=].</li>
-              <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use [=edit context=]'s [=selection range=].</li>
-              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the user agent will use [=edit context=]'s [=selection bounds=], [=character bounds=], and [=control bounds=] respectively.</li>
+              <li>Instead of deriving the text content of the [=Text Edit Context=] from the DOM, it will be taken from the {{EditContext}}'s [=text=].</li>
+              <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use the {{EditContext}}'s [=selection start=] and [=selection end=].</li>
+              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the user agent will use the {{EditContext}}'s [=selection bounds=], [=array of character bounds=], and [=control bounds=] respectively.</li>
             </ol>
 
             <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
