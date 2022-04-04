@@ -438,7 +438,7 @@
     <section id="conformance">
         <p>
           This specification defines conformance criteria that apply to a single
-          product: the <dfn id="dfn-user-agent">user agent</dfn> that implements the interfaces that
+          product: the user agent that implements the interfaces that
           it contains.
         </p>
         <p>
@@ -506,7 +506,7 @@
                     <dl>
                         <dt>Input</dt>
                         <dd>|newText|, a string</dd>
-                        <dd>|textSpans|, a structure that has text format info</dd>
+                        <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
                         <dd>|newSelectionStart|, the new position for the start of the selection</dd>
                         <dd>|newSelectionEnd|, the new position for the end of the selection</dd>
                         <dt>Output</dt>
@@ -541,7 +541,7 @@
                 <li>Set [=selection end=] to |newSelectionEnd|</li>
                 <li>[=Dispatch text update event=] with |newText|</li>
                 <li>Set [=composition end=] to [=composition start=] plus the length of |newText|</li>
-                <li>[=Dispatch text format update event=] with |textSpans|</li>
+                <li>[=Dispatch text format update event=] with |textFormats|</li>
                 <li>[=Dispatch character bound update event=]</li>
             </ol>
             </div><!-- algorithm -->
@@ -585,13 +585,30 @@
     <div class="algorithm">
         <dl>
             <dt>Input</dt>
-            <dd>|textSpans|, a structure that has text format info</dd>
+            <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
             <dt>Output</dt>
             <dd>None</dd>
         </dl>
 <ol>
     <li>
-        Let |event| be a new {{TextFormatUpdateEvent}} with |textSpans|
+        Let |formats| be an array of {{TextFormat}}, initially empty.
+    </li>
+    <li>
+        For each text format in |textFormats|,
+        <ol>
+            <li>Set |rangeStart| be the start index of the range where the format will be applied to.</li>
+            <li>Set |rangeEnd| be the end index of the range</li>
+            <li>Set |textColor| be the color of the text. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
+            <li>Set |backgroundColor| be the color of the background. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
+            <li>Set |underlineStyle| be the underline style. The value is one of the following strings: "None", "Solid", "Dotted", "Dashed", and "Wavy". </li>
+            <li>Set |underlineThickness| be the underline thickness. The value is one of the following strings: "None", "Thin", and "Thick"</li>
+            <li>Set |underlineColor| be the underline color. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
+            <li>Let |textFormat| be a {{TextFormat}} with |rangeStart|, |rangeEnd|, |textColor|, |backgroundColor|, |underlineStyle|, |underlineThickness|, and |underlineColor|.</li>
+            <li>Add |textFormat| to |formats|</li>
+        </ol>
+    </li>
+    <li>
+        Let |event| be a new {{TextFormatUpdateEvent}} with |formats|
     </li>
     <li> [=Fire an event=] named "textformateupdate" with |event|</li>
 </ol>
@@ -1070,7 +1087,7 @@ interface TextFormatUpdateEvent : Event {
                 </dd>
                 <dt>{{TextFormat/underlineStyle}}, of type {{DOMString}}, readonly
                 </dt>
-                <dd>The style of the underline. The value is one of the following strings: "None", "Solid", "Dotted", "Dashed", and "Squiggle".
+                <dd>The style of the underline. The value is one of the following strings: "None", "Solid", "Dotted", "Dashed", and "Wavy".
                 </dd>
                 <dt>{{TextFormat/underlineThickness}}, of type {{DOMString}}, readonly
                 </dt>
