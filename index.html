@@ -115,7 +115,7 @@
                 <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate=] system and the initial x, y, width, and height are all 0.</li>
                 <li><dfn>codepoint locations</dfn> which is an array of [=codepoint location=]. The array is initially empty.</li>
             </ul>
-            <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at a specified offset.  The struct contains:</p>
+            <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at an offset within [=text=] indicated by [=start index=].  The struct contains:</p>
             <ul>
                 <li><dfn>start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
                 <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint.</li>
@@ -124,7 +124,11 @@
             <ul>
                 <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
             </ul>
-            <p>Associating an {{EditContext}} to an element makes that element eligible to become an [=editing host=].  An <dfn>editing host</dfn> is as an [=editable element=], but whose parent is not an [=editable element=].</p>
+            <p>
+                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An <dfn>editing host</dfn> is as an [=editable element=] which serves as the target for input events.  
+                Prior to the existence of {{EditContext}}, an [=editing host=] was limited to [=editable element=]s whose parents are not [=editable element=]s.
+                With the introduction of {{EditContext}}, the definition is expanded to include any element associated with an {{EditContext}}.
+            </p>
             <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element for which it is the [=editing host=], is the [=active element=] in a [=fully active document=].</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             
