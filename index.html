@@ -89,52 +89,45 @@
         </section>
         <section id="editcontext-model">
             <h3>The EditContext Model</h3>
-            <section id="text-input-abstractions">
-                <h3>Text Input Abstractions</h3>
-                <div class="note">
-                    <p>
-                        The [=Text Input Service=] and [=Text Edit Context=] are abstractions representing the common aspects of text input across many operating systems. 
-                        Because {{EditContext}} is a primitive API designed to integrate with these various text input implementations, this spec will first define the [=Text Input Service=] and [=Text Edit Context=] abstractions, and then define how the {{EditContext}} is used by authors to interact with those abstractions.
-                        This specification does not define how a user agent should construct such abstractions.
-                    </p>
-                </div>
-                <p>The [=Text Edit Context=] has a [=TEC text=] array, a [=TEC selection start=] index, a [=TEC selection end=] index, a [=TEC composition start=] index, a [=TEC composition end=] index, a [=TEC is composing=] flag, a [=TEC control bounds=], a [=TEC selection bounds=], and a [=TEC array of character location data=].</p>
-                <p>The <dfn>TEC text</dfn> is a UTF-16 encoded string of code points representing editable content. The initial value is the empty string.</p>
-                <p>The <dfn>TEC selection start</dfn> index identifies the offset of the selection's starting position within [=TEC text=]. The value must be between 0 and the length of [=TEC text=] (inclusive). The initial value is 0.</p>
-                <p>The <dfn>selection end</dfn> position is the end position of the current selection. The initial value is 0.</p>
-                <p>The <dfn>composition start</dfn> position is the start of the current composition. The initial value is 0</p>
-                <p>The <dfn>composition end</dfn> position is the end of the current composition. The initial value is 0</p>
-                <p>The <dfn>is composing</dfn> flag indicates if there is an active composition. The initial value is false</p>
-                <p>The <dfn>control bounds</dfn> is the bounding box of the display surface. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, and 0, respectively.</p>
-                <p>The <dfn>selection bounds</dfn> is the bounding box of the selection. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, 0, respectively.</p>
-                <p>The <dfn>array of character bounds</dfn> consists of the bounding boxes of the rendering result of the characters in a substring of [=text=]. These bounding boxes are used by the [=Text Input Method=] to properly position its user interface. The bounding boxes are in [=client coordinate=] and the array is initially empty.</p>    
-            </section>
+            <p>
+                The [=Text Input Service=] and [=Text Edit Context=] are abstractions representing the common aspects of text input across many operating systems.
+                An {{EditContext}} is a JavaScript reflection of the [=Text Edit Context=]. 
+                When changes are made to the [=Text Edit Context=] by the [=Text Input Service=], those changes are reflected to the author asynchronously in the form of events which are dispatched against the [=active EditContext=].
+                When the author makes changes to the [=active EditContext=], those changes will be reflected in the [=Text Edit Context=] during the next lifecycle update.
+            </p>
+            <p>
+                To reflect changes made by the author to the [=active EditContext=] since the last lifecycle update, run the steps to [=update the Text Edit Context=].
+            </p>
+            <p>
+                When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=].
+            </p>
+            <p>
+                Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=]. The <dfn>text state</dfn> consists of:
+            </p>
+            <ul>
+                <li><dfn>text</dfn> which is a {{DOMString}} representing editable content. The initial value is the empty string.</li>
+                <li><dfn>selection start</dfn> which refers to the offset in [=text=] where the selection starts. The initial value is 0.</li>
+                <li><dfn>selection end</dfn> which refers to the offset in [=text=] where the selection ends. The initial value is 0. [=selection end=] must always be greater than or equal to [=selection start=].</li>
+                <li><dfn>is composing</dfn> which indicates if there is an active composition. The initial value is false.</li>
+                <li><dfn>composition start</dfn> which refers to the offset in [=text=] representing the start position of the text being actively composed. The initial value is 0.</p></li>
+                <li><dfn>composition end</dfn> which refers to the offset in [=text=] representing the end position of the text being actively composed. The initial value is 0. [=composition end=] must always be greater than or equal to [=composition start=].</li>
+                <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate=] system and the initial x, y, width, and height all 0.</li>
+                <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate=] system and the initial x, y, width, and height are all 0.</li>
+                <li><dfn>codepoint locations</dfn> which is an array of [=codepoint location=]. The array is initially empty.</li>
+            </ul>
+            <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at a specified offset.  The struct contains:</p>
+            <ul>
+                <li><dfn>start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
+                <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint.</li>
+            </ul>
+            <p>In addition to [=text state=], an {{EditContext}} also has:
+            <ul>
+                <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
+            </ul>
+            <p>Associating an {{EditContext}} to an element makes that element eligible to become an [=editing host=].  An <dfn>editing host</dfn> is as an [=editable element=], but whose parent is not an [=editable element=].</p>
+            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element for which it is the [=editing host=], is the [=active element=] in a [=fully active document=].</p>
+            <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             
-            
-            
-            <p>An {{EditContext}} is a JavaScript projection of the [=Text Edit Context=]. Changes made to the [=Text Edit Context=] by the [=Text Input Service=] are communicated to the author in the form of events dispatched against it's associated {{EditContext}}.</p>
-            
-            
-
-            <p></p>
-            <p>An {{EditContext}} has a [=text=], a [=selection start=] position, a [=selection end=] position, a [=composition start=] position,  a [=composition end=] position, a [=is composing=] flag, a [=control bounds=], a [=selection bounds=], an [=array of character bounds=] and a [=character bounds range start=] index.
-            <p>The <dfn>text</dfn> consists of the plain text of the editable content. The initial value is the empty string.</p>
-            <p>The <dfn>selection start</dfn> position is the start position of the current selection. The initial value is 0.</p>
-            <p>The <dfn>selection end</dfn> position is the end position of the current selection. The initial value is 0.</p>
-            <p>The <dfn>composition start</dfn> position is the start of the current composition. The initial value is 0</p>
-            <p>The <dfn>composition end</dfn> position is the end of the current composition. The initial value is 0</p>
-            <p>The <dfn>is composing</dfn> flag indicates if there is an active composition. The initial value is false</p>
-            <p>The <dfn>control bounds</dfn> is the bounding box of the display surface. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, and 0, respectively.</p>
-            <p>The <dfn>selection bounds</dfn> is the bounding box of the selection. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, 0, respectively.</p>
-            <p>The <dfn>array of character bounds</dfn> consists of the bounding boxes of the rendering result of the characters in a substring of [=text=]. These bounding boxes are used by the [=Text Input Method=] to properly position its user interface. The bounding boxes are in [=client coordinate=] and the array is initially empty.</p>
-            <p>The <dfn>character bounds range start</dfn> index is the index in the [=text=] for the first character of the [=array of character bounds=]. The inital value is 0.</p>
-
-            <p>Associating an {{EditContext}} to an element makes that element intrinsically [=focusable=].  When the element is focused, the user agent will use the state of the {{EditContext}} to construct a [=Text Edit Context=] that is provided to the [=Text Input Service=] of the OS:</p>
-            <ol>
-              <li>Instead of deriving the text content of the [=Text Edit Context=] from the DOM, it will be taken from the {{EditContext}}'s [=text=].</li>
-              <li>Instead of deriving the location of selection within that text from the document’s selection, the user agent will use the {{EditContext}}'s [=selection start=] and [=selection end=].</li>
-              <li>Instead of querying the DOM’s associated CSS boxes for the size and position of selection, character bounds, and the editable region of the document, the user agent will use the {{EditContext}}'s [=selection bounds=], [=array of character bounds=], and [=control bounds=] respectively.</li>
-            </ol>
 
             <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
