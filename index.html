@@ -631,17 +631,28 @@
 </div><!-- algorithm -->
 <h4><dfn>Update Text Input Service</dfn></h4>
 <div class="algorithm">
+    <div class="note">
+        <p>Some platform implementations require that the [=Text Edit Context=] be able to supply
+        data about its content synchronously.  This is challenging since the most up-to-date data
+        is typically held in JavaScript data structures maintained by the author, and input threads
+        used for text input should generally not be blocked on JavaScript processing.</p>
+        <p>To avoid a blocking implementation, the data required by the [=Text Edit Context=] is stored
+        in the {{EditContext}} by the author.  With each frame, the web platform must copy the
+        contents of the {{EditContext}} to the [=Text Edit Context=].  When the platform's [=Text Input Service=]
+        queries the [=Text Edit Context=], the data used to answer the query will be only a frame behind.</p>
+        <p>The algorithm below captures the steps to copy that data.</p>
+    </div>
     <dl>
         <dt>Input</dt>
         <dd>None</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
-<ol>
-<li>
-    <div class="note">Add details</div>
-</li>
-</ol>
+    <ol>
+        <li>
+            <div class="note">Add details</div>
+        </li>
+    </ol>
 </div><!-- algorithm -->
 <h4><dfn>Modify BeforeInput Event</dfn></h4>
 <div class="algorithm">
