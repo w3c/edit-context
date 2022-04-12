@@ -89,7 +89,34 @@
         </section>
         <section id="editcontext-model">
             <h3>The EditContext Model</h3>
+            <section id="text-input-abstractions">
+                <h3>Text Input Abstractions</h3>
+                <div class="note">
+                    <p>
+                        The [=Text Input Service=] and [=Text Edit Context=] are abstractions representing the common aspects of text input across many operating systems. 
+                        Because {{EditContext}} is a primitive API designed to integrate with these various text input implementations, this spec will first define the [=Text Input Service=] and [=Text Edit Context=] abstractions, and then define how the {{EditContext}} is used by authors to interact with those abstractions.
+                        This specification does not define how a user agent should construct such abstractions.
+                    </p>
+                </div>
+                <p>The [=Text Edit Context=] has a [=TEC text=] array, a [=TEC selection start=] index, a [=TEC selection end=] index, a [=TEC composition start=] index, a [=TEC composition end=] index, a [=TEC is composing=] flag, a [=TEC control bounds=], a [=TEC selection bounds=], and a [=TEC array of character location data=].</p>
+                <p>The <dfn>TEC text</dfn> is a UTF-16 encoded string of code points representing editable content. The initial value is the empty string.</p>
+                <p>The <dfn>TEC selection start</dfn> index identifies the offset of the selection's starting position within [=TEC text=]. The value must be between 0 and the length of [=TEC text=] (inclusive). The initial value is 0.</p>
+                <p>The <dfn>selection end</dfn> position is the end position of the current selection. The initial value is 0.</p>
+                <p>The <dfn>composition start</dfn> position is the start of the current composition. The initial value is 0</p>
+                <p>The <dfn>composition end</dfn> position is the end of the current composition. The initial value is 0</p>
+                <p>The <dfn>is composing</dfn> flag indicates if there is an active composition. The initial value is false</p>
+                <p>The <dfn>control bounds</dfn> is the bounding box of the display surface. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, and 0, respectively.</p>
+                <p>The <dfn>selection bounds</dfn> is the bounding box of the selection. It is in the [=client coordinate=] and the initial x, y, width, and height are 0, 0, 0, 0, respectively.</p>
+                <p>The <dfn>array of character bounds</dfn> consists of the bounding boxes of the rendering result of the characters in a substring of [=text=]. These bounding boxes are used by the [=Text Input Method=] to properly position its user interface. The bounding boxes are in [=client coordinate=] and the array is initially empty.</p>    
+            </section>
             
+            
+            
+            <p>An {{EditContext}} is a JavaScript projection of the [=Text Edit Context=]. Changes made to the [=Text Edit Context=] by the [=Text Input Service=] are communicated to the author in the form of events dispatched against it's associated {{EditContext}}.</p>
+            
+            
+
+            <p></p>
             <p>An {{EditContext}} has a [=text=], a [=selection start=] position, a [=selection end=] position, a [=composition start=] position,  a [=composition end=] position, a [=is composing=] flag, a [=control bounds=], a [=selection bounds=], an [=array of character bounds=] and a [=character bounds range start=] index.
             <p>The <dfn>text</dfn> consists of the plain text of the editable content. The initial value is the empty string.</p>
             <p>The <dfn>selection start</dfn> position is the start position of the current selection. The initial value is 0.</p>
