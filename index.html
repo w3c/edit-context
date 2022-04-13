@@ -530,7 +530,7 @@
 
             <p>When an {{EditContext}} is [=activated=], the user agent must [=Update Text Input Service=] with the current state of the activated {{EditContext}} at least once every frame.</p>
 
-            <p>When an {{EditContext}} is [=activated=], the user agent must [=Modify BeforeInput Event=]'s behavior and must not fire any [=InputEvent=] when there is user text input from the [=Text Input Service=].</p>
+            <p>When an {{EditContext}} is [=activated=] and there is user text input from the [=Text Input Service=], the user agent must [=Modify BeforeInput Event=]'s behavior and must not fire any [=InputEvent=].</p>
 
             <p>When an element with an associated {{EditContext}} is connected to the tree, the user agent must run [=Connect Element=].</p>
 
@@ -577,7 +577,7 @@
                 <li>[=Dispatch text update event=] with |newText|</li>
                 <li>Set [=composition end=] to [=composition start=] plus the length of |newText|</li>
                 <li>[=Dispatch text format update event=] with |textFormats|</li>
-                <li>[=Dispatch character bound update event=]</li>
+                <li>[=Dispatch character bounds update event=]</li>
             </ol>
             </div><!-- algorithm -->
 
@@ -635,21 +635,18 @@
             <li>Set |rangeEnd| be the end index of the range</li>
             <li>Set |textColor| be the color of the text. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
             <li>Set |backgroundColor| be the color of the background. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
-            <li>Set |underlineStyle| be the underline style. The value is one of the following strings: "None", "Solid", "Dotted", "Dashed", and "Wavy". </li>
-            <li>Set |underlineThickness| be the underline thickness. The value is one of the following strings: "None", "Thin", and "Thick"</li>
+            <li>Set |underlineStyle| be the underline style. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
+            <li>Set |underlineThickness| be the underline thickness. The value is one of the following strings: "none", "thin", and "thick"</li>
             <li>Set |underlineColor| be the underline color. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
             <li>Let |textFormat| be a {{TextFormat}} with |rangeStart|, |rangeEnd|, |textColor|, |backgroundColor|, |underlineStyle|, |underlineThickness|, and |underlineColor|.</li>
             <li>Add |textFormat| to |formats|</li>
         </ol>
     </li>
-    <li>
-        Let |event| be a new {{TextFormatUpdateEvent}} with |formats|
-    </li>
-    <li> [=Fire an event=] named "textformateupdate" with |event|</li>
+    <li> [=Fire an event=] named "textformateupdate" at the activated EditContext using {{TextFormatUpdateEvent}} with |formats|</li>
 </ol>
 </div><!-- algorithm -->
 
-<h4><dfn>Dispatch character bound update event</dfn></h4>
+<h4><dfn>Dispatch character bounds update event</dfn></h4>
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
