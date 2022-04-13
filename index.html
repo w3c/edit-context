@@ -654,19 +654,13 @@
 <li> [=Fire an event=] named "characterboundsupdate" with |event|</li>
 </ol>
 </div><!-- algorithm -->
-<h4><dfn>Update Text Input Service</dfn></h4>
+<h4><dfn>Update the Text Edit Context</dfn></h4>
 <div class="algorithm">
-    <div class="note">
-        <p>Some platform implementations require that the [=Text Edit Context=] be able to supply
-        data about its content synchronously.  This is challenging since the most up-to-date data
-        is typically held in JavaScript data structures maintained by the author, and input threads
-        used for text input should generally not be blocked on JavaScript processing.</p>
-        <p>To avoid a blocking implementation, the data required by the [=Text Edit Context=] is stored
-        in the {{EditContext}} by the author.  With each frame, the web platform must copy the
-        contents of the {{EditContext}} to the [=Text Edit Context=].  When the platform's [=Text Input Service=]
-        queries the [=Text Edit Context=], the data used to answer the query will be only a frame behind.</p>
-        <p>The algorithm below captures the steps to copy that data.</p>
-    </div>
+    <p>
+        This processing step must occur as a substep within the [=Update the rendering=] step in the HTML Event Loops Processing Model.
+        The step is: Run the [=Update the Text Edit Context=] steps.
+        It must occur just after substep 13: run the animation frame callbacks steps.
+    </p>
     <dl>
         <dt>Input</dt>
         <dd>None</dd>
@@ -674,9 +668,13 @@
         <dd>None</dd>
     </dl>
     <ol>
-        <li>
-            <div class="note">Add details</div>
-        </li>
+        <li>If the [=active EditContext=] is null, abort these steps.</li>
+        <li>let editContext be the currently [=active EditContext=].</li>
+        <li>If editContext's [=dirty=] flag is false, abort these steps.</li>
+        <li>If editContext's [=has called updateCharacterBounds=] flag is false, run the steps to [=Dispatch character bound update event=].</li>
+        <li>If the [=active EditContext=] is not editContext, abort these steps.</li>
+        <li>let textState be editContext's [=text state=].</li>
+        <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
     </ol>
 </div><!-- algorithm -->
 <h4><dfn>Modify BeforeInput Event</dfn></h4>
