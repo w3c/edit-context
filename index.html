@@ -102,7 +102,7 @@
                 When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=].
             </p>
             <p>
-                Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=]. The <dfn>text state</dfn> consists of:
+                Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=] which holds the information exchanged in the aforementioned updates. The <dfn>text state</dfn> consists of:
             </p>
             <ul>
                 <li><dfn>text</dfn> which is a {{DOMString}} representing editable content. The initial value is the empty string.</li>
@@ -125,12 +125,13 @@
                 <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
             </ul>
             <p>
-                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An <dfn>editing host</dfn> is as an [=editable element=] which serves as the target for input events.  
+                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An <dfn>editing host</dfn> is an [=editable element=] which serves as the target for input events.  
                 Prior to the existence of {{EditContext}}, an [=editing host=] was limited to [=editable element=]s whose parents are not [=editable element=]s.
                 With the introduction of {{EditContext}}, the definition is expanded to include any element associated with an {{EditContext}}.
             </p>
             <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element for which it is the [=editing host=], is the [=active element=] in a [=fully active document=].</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
+            <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
             
 
             <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
