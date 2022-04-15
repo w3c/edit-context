@@ -50,8 +50,7 @@
 
 <body>
     <section id='abstract'>
-        <p>The {{EditContext}} is a new API that allows authors to more directly participate in the text input process.
-        </p>
+        <p>The {{EditContext}} is a new API that allows authors to more directly participate in the text input process.</p>
     </section>
     <section id='sotd'>
       <p>
@@ -120,16 +119,27 @@
                 <li><dfn>start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
                 <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint.</li>
             </ul>
+            <p class="note">
+                [=Codepoint locations=] provides the means for the user agent to query multiple ranges of [=text=] for positioning information.
+                Different platforms may require different positions to be cached to fulfill queries from the [=Text Input Service=] and this API shape allows for that flexibility.
+                It would be good if the API could be simplified to require just the positions of the actively composed text along with the [=selection bounds=] and [=control bounds=].
+                Exploration is needed to see if that is possible.
+            </p>
             <p>In addition to [=text state=], an {{EditContext}} also has:
             <ul>
                 <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
+                <li><dfn>character bounds updated flag</dfn> which is initially false.</li>
             </ul>
             <p>
-                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An <dfn>editing host</dfn> is an [=editable element=] which serves as the target for input events.  
+                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An [=editing host=] is an [=editable element=] which serves as the target for input events.  
                 Prior to the existence of {{EditContext}}, an [=editing host=] was limited to [=editable element=]s whose parents are not [=editable element=]s.
                 With the introduction of {{EditContext}}, the definition is expanded to include any element associated with an {{EditContext}}.
             </p>
-            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element for which it is the [=editing host=], is the [=active element=] in a [=fully active document=].</p>
+            <p class="note">
+                [=Editing host=] may not be the best term to use to describe the impact of associating an {{EditContext}} with an {{HTMLElement}}.
+                It has similarities, such as making the {{HTMLElement}} the target for input events, but also differences in that the content of the [=editing host=] is not changed as a result of that input.
+            </p>
+            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element is [=focused=].</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
             
@@ -486,9 +496,10 @@
                     attribute EditContext? editContext;
                };
             </pre>
+            <p>An {{HTMLElement}} has an internal slot [[\EditContext]], which is a reference to an {{EditContext}} and is intially null.</p>
             <dl>
                 <dt>editContext</dt>
-                <dd>Initially null. The {{HTMLElement/editContext}} getter steps are to return [=this=]'s {{EditContext}} if there is an {{EditContext}} associated.</dd>
+                <dd>The {{HTMLElement/editContext}} getter steps are to return the value of [=this=]'s internal [[\EditContext]] slot.</dd>
                 <dd>The {{HTMLElement/editContext}} setter must follow these steps:
                     <div class="algorithm">
                         <dl>
@@ -497,19 +508,18 @@
                             <dt>Output</dt>
                             <dd>None</dd>
                         </dl>
-                    <ol>
-                    <li>If |editContext| is null
                         <ol>
-                            <li>run [=Detach EditContext=]</li>
+                            <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
+                            <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|</li>
+                            <li>If |oldEditContext| is the [=active EditContext=]
+                                <ol>
+                                    <li>Run the steps [=Deactivate an EditContext=] with |oldEditContext|</li>
+                                    <li>Run the steps to [=Activate an EditContext=] with |editContext|</li>
+                                </ol>
+                            </li>
                         </ol>
-                    </li>
-                    <li>Else
-                        <ol>
-                            <li>run [=Attach EditContext=]</li>
-                        </ol>
-                    </li>                    
-                    </ol>
-                    </div><!-- algorithm -->                    
+                    </div><!-- algorithm -->
+                </dd>
             </dl>
    
             <p>When an element is associated with an {{EditContext}}, it is [=editable=] regardless of whether its [=contentediable=] attribute is true or not.</p>
@@ -668,14 +678,18 @@
         <dd>None</dd>
     </dl>
     <ol>
-        <li>If the [=active EditContext=] is null, abort these steps.</li>
         <li>let editContext be the currently [=active EditContext=].</li>
-        <li>If editContext's [=dirty=] flag is false, abort these steps.</li>
-        <li>If editContext's [=has called updateCharacterBounds=] flag is false, run the steps to [=Dispatch character bound update event=].</li>
-        <li>If the [=active EditContext=] is not editContext, abort these steps.</li>
+        <li>If editContext is null, abort these steps.</li>
+        <li>If editContext's [=dirty flag=] is false, abort these steps.</li>
+        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bound update event=].</li>
+        <li>If the [=active EditContext=] is no longer editContext, abort these steps.</li>
         <li>let textState be editContext's [=text state=].</li>
         <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
     </ol>
+    <p class="note">
+        Note the steps to update the [=Text Edit Context=]'s [=text state=] to match the values in textState is dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
+        Those details are not part of this specification.
+    </p>
 </div><!-- algorithm -->
 <h4><dfn>Modify BeforeInput Event</dfn></h4>
 <div class="algorithm">
@@ -692,40 +706,34 @@
 </ol>
 </div><!-- algorithm -->
 
-<h4><dfn>focused</dfn></h4>
+<h4><dfn>Activate an EditContext</dfn></h4>
 <div class="algorithm">
-<ol>
-<li>
-    <div class="note">Add details</div>
-</li>
-</ol>
+    <dl>
+        <dt>Input</dt>
+        <dd>|this| an {{EditContext}}</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+    <ol>
+        <li>
+            <div class="note">Add details</div>
+        </li>
+    </ol>
 </div><!-- algorithm -->
 
-<h4><dfn>blurred</dfn></h4>
+<h4><dfn>Deactivate an EditContext</dfn></h4>
 <div class="algorithm">
-<ol>
-<li>
-    <div class="note">Add details</div>
-</li>
-</ol>
-</div><!-- algorithm -->
-
-<h4><dfn>Connect Element</dfn></h4>
-<div class="algorithm">
-<ol>
-<li>
-    <div class="note">Add details</div>
-</li>
-</ol>
-</div><!-- algorithm -->
-
-<h4><dfn>Disconnect Element</dfn></h4>
-<div class="algorithm">
-<ol>
-<li>
-    <div class="note">Add details</div>
-</li>
-</ol>
+    <dl>
+        <dt>Input</dt>
+        <dd>|this| an {{EditContext}}</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+    <ol>
+        <li>
+            <div class="note">Add details</div>
+        </li>
+    </ol>
 </div><!-- algorithm -->
 
 <h4><dfn>Attach EditContext</dfn></h4>
