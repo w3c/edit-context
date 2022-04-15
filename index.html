@@ -82,7 +82,7 @@
                 <figcaption>A sequence diagram illustrating a typical flow for text input.</figcaption>
             </figure>
             <p>Existing user agents handle the details of this text input process so that the author’s responsibility ends at declaring what elements of the document represent an editable region.  Authors express which regions are editable using input elements, textarea elements, contenteditable elements, or by setting the designMode attribute to true to mark an entire document as editable. </p>
-            <p>As an editable region of the document is focused, the user agent automatically produces the [=Text Edit Context=] from the contents of the editable region and the position of the selection within it.  When a [=Text Input Method=] produces text, the user agent translates the events against its [=Text Edit Context=] into a set of DOM and style modifications – only some of which are described using existing events that an author can handle. </p>
+            <p>As an editable region of the document is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>, the user agent automatically produces the [=Text Edit Context=] from the contents of the editable region and the position of the selection within it.  When a [=Text Input Method=] produces text, the user agent translates the events against its [=Text Edit Context=] into a set of DOM and style modifications – only some of which are described using existing events that an author can handle. </p>
             <p>Authors that want to produce sophisticated editing experiences may be challenged by the current approach.  If, for example, the text and selection are rendered to a canvas, user agents are unable to produce a [=Text Edit Context=] to drive the text input process.  Authors compensate by resorting to offscreen editable elements, but this approach comes with negative implications for accessibility, it deteriorates the input experience, and requires complex code to synchronize the position of the text in the offscreen editable element with the corresponding text in the canvas. </p>
             <p>With the introduction of this EditContext API, authors can more directly participate in the protocol for text input and avoid the pitfalls described above.</p>
         </section>
@@ -139,7 +139,7 @@
                 [=Editing host=] may not be the best term to use to describe the impact of associating an {{EditContext}} with an {{HTMLElement}}.
                 It has similarities, such as making the {{HTMLElement}} the target for input events, but also differences in that the content of the [=editing host=] is not changed as a result of that input.
             </p>
-            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element is [=focused=].</p>
+            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
             
@@ -524,7 +524,7 @@
    
             <p>When an element is associated with an {{EditContext}}, it is [=editable=] regardless of whether its [=contentediable=] attribute is true or not.</p>
     
-            <p>An element's {{EditContext}} is [=activated=] when the element is [=focused=], and deactivated when the associated element is [=blurred=].</p>
+            <p>An element's {{EditContext}} is [=activated=] when the element is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>, and deactivated when the associated element is [=blurred=].</p>
     
             <p>When an {{EditContext}} is [=activated=], the user agent must not modify the DOM when there is user text input from the [=Text Input Service=], instead, the user agent must run [=Update the composition=] if the text input is a composition, and [=Update the text=] if the text input is not a composition.</p>
 
