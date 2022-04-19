@@ -533,10 +533,18 @@
                         <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
                         <dd>|newSelectionStart|, the new position for the start of the selection</dd>
                         <dd>|newSelectionEnd|, the new position for the end of the selection</dd>
+                        <dd>|isComposing|, </dd>
+                        <dd>|replacementRangeStart|, </dd>
+                        <dd>|replacementRangeEnd|, </dd>
                         <dt>Output</dt>
                         <dd>None</dd>
                     </dl>
             <ol>
+                <li>If the [=active EditContext=] != cached active EditContext
+                    <ol>
+                        <li>Return</li>
+                    </ol>
+                </li>
                 <li>
                     If |newText| is not empty and [=is composing=] is false
                     <ol>
