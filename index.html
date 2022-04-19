@@ -142,7 +142,11 @@
             <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
+
+            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must not modify the DOM and must not fire any <a href=https://w3c.github.io/input-events>InputEvent</a>.</p>
             
+            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
+
 
             <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
@@ -521,22 +525,7 @@
                     </div><!-- algorithm -->
                 </dd>
             </dl>
-   
-            <p>When an element is associated with an {{EditContext}}, it is [=editable=] regardless of whether its [=contentediable=] attribute is true or not.</p>
-    
-            <p>An element's {{EditContext}} is [=activated=] when the element is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>, and deactivated when the associated element is [=blurred=].</p>
-    
-            <p>When an {{EditContext}} is [=activated=], the user agent must not modify the DOM when there is user text input from the [=Text Input Service=], instead, the user agent must run [=Update the composition=] if the text input is a composition, and [=Update the text=] if the text input is not a composition.</p>
-
-            <p>When an {{EditContext}} is [=activated=], the user agent must [=Update Text Input Service=] with the current state of the activated {{EditContext}} at least once every frame.</p>
-
-            <p>When an {{EditContext}} is [=activated=] and there is user text input from the [=Text Input Service=], the user agent must [=Modify BeforeInput Event=]'s behavior and must not fire any [=InputEvent=].</p>
-
-            <p>When an element with an associated {{EditContext}} is connected to the tree, the user agent must run [=Connect Element=].</p>
-
-            <p>When an element with an associated {{EditContext}} is disconnected from the tree, the user agent must run [=Disconnect Element=].</p>
-
-                <h4><dfn>Update the composition</dfn></h4>
+                <h4><dfn>Update the EditContext</dfn></h4>
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
@@ -580,25 +569,6 @@
                 <li>[=Dispatch character bounds update event=]</li>
             </ol>
             </div><!-- algorithm -->
-
-            <h4><dfn>Update the text</dfn></h4>
-            <div class="algorithm">
-                <dl>
-                    <dt>Input</dt>
-                    <dd>|newText|, a string</dd>
-                    <dt>Output</dt>
-                    <dd>None</dd>
-                </dl>
-
-                <ol>
-                    <li>
-                        Replace the substring of [=text=] in the range of [=selection start=] and [=selection end=] with |newText|
-                    </li>
-                    <li>Set [=selection start=] to [=selection start=] plus the length of |newText|</li>
-                    <li>Set [=selection end=] to [=selection start=]</li>
-                    <li>[=Dispatch text update event=] with |newText|</li>
-                </ol>
-            </div>
 
             <h4><dfn>Dispatch text update event</dfn></h4>
         <div class="algorithm">
@@ -678,7 +648,7 @@
         <li>let editContext be the currently [=active EditContext=].</li>
         <li>If editContext is null, abort these steps.</li>
         <li>If editContext's [=dirty flag=] is false, abort these steps.</li>
-        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bound update event=].</li>
+        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
         <li>If the [=active EditContext=] is no longer editContext, abort these steps.</li>
         <li>let textState be editContext's [=text state=].</li>
         <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
