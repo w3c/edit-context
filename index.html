@@ -591,7 +591,35 @@
             </ol>
             </div><!-- algorithm -->
 
-            <h4><dfn>Dispatch text update event</dfn></h4>
+<h4><dfn>Update the Text Edit Context</dfn></h4>
+<div class="algorithm">
+    <p>
+        This processing step must occur as a substep within the [=Update the rendering=] step in the HTML Event Loops Processing Model.
+        The step is: Run the [=Update the Text Edit Context=] steps.
+        It must occur just after substep 13: run the animation frame callbacks steps.
+    </p>
+    <dl>
+        <dt>Input</dt>
+        <dd>None</dd>
+        <dt>Output</dt>
+        <dd>None</dd>
+    </dl>
+    <ol>
+        <li>let editContext be the currently [=active EditContext=].</li>
+        <li>If editContext is null, abort these steps.</li>
+        <li>If editContext's [=dirty flag=] is false, abort these steps.</li>
+        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
+        <li>If the [=active EditContext=] is no longer editContext, abort these steps.</li>
+        <li>let textState be editContext's [=text state=].</li>
+        <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
+    </ol>
+    <p class="note">
+        Note the steps to update the [=Text Edit Context=]'s [=text state=] to match the values in textState is dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
+        Those details are not part of this specification.
+    </p>
+</div><!-- algorithm -->
+
+<h4><dfn>Dispatch text update event</dfn></h4>
         <div class="algorithm">
             <dl>
                 <dt>Input</dt>
@@ -651,33 +679,6 @@
 </li>
 <li> [=Fire an event=] named "characterboundsupdate" with |event|</li>
 </ol>
-</div><!-- algorithm -->
-<h4><dfn>Update the Text Edit Context</dfn></h4>
-<div class="algorithm">
-    <p>
-        This processing step must occur as a substep within the [=Update the rendering=] step in the HTML Event Loops Processing Model.
-        The step is: Run the [=Update the Text Edit Context=] steps.
-        It must occur just after substep 13: run the animation frame callbacks steps.
-    </p>
-    <dl>
-        <dt>Input</dt>
-        <dd>None</dd>
-        <dt>Output</dt>
-        <dd>None</dd>
-    </dl>
-    <ol>
-        <li>let editContext be the currently [=active EditContext=].</li>
-        <li>If editContext is null, abort these steps.</li>
-        <li>If editContext's [=dirty flag=] is false, abort these steps.</li>
-        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
-        <li>If the [=active EditContext=] is no longer editContext, abort these steps.</li>
-        <li>let textState be editContext's [=text state=].</li>
-        <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
-    </ol>
-    <p class="note">
-        Note the steps to update the [=Text Edit Context=]'s [=text state=] to match the values in textState is dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
-        Those details are not part of this specification.
-    </p>
 </div><!-- algorithm -->
 
 <h4><dfn>Activate an EditContext</dfn></h4>
