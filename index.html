@@ -95,10 +95,12 @@
                 When the author makes changes to the [=active EditContext=], those changes will be reflected in the [=Text Edit Context=] during the next lifecycle update.
             </p>
             <p>
-                To reflect changes made by the author to the [=active EditContext=] since the last lifecycle update, run the steps to [=update the Text Edit Context=].
+                To reflect changes made by the author to the [=active EditContext=] since the last lifecycle update, run the steps to [=update the Text Edit Context=] 
+                with the [=active EditContext=]'s [=text state=]'s [=text=], [=select start=], [=select end=], [=control bounds=], [=selection bounds=], and [=codepoint locations=].
             </p>
             <p>
-                When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=].
+                When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=] 
+                with the [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=], [=selection start=], [=selection end=], [=is composing=], [=composition start=], and [=composition end=].
             </p>
             <p>
                 Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=] which holds the information exchanged in the aforementioned updates. The <dfn>text state</dfn> consists of:
@@ -110,9 +112,20 @@
                 <li><dfn>is composing</dfn> which indicates if there is an active composition. The initial value is false.</li>
                 <li><dfn>composition start</dfn> which refers to the offset in [=text=] representing the start position of the text being actively composed. The initial value is 0.</p></li>
                 <li><dfn>composition end</dfn> which refers to the offset in [=text=] representing the end position of the text being actively composed. The initial value is 0. [=composition end=] must always be greater than or equal to [=composition start=].</li>
+                <li><dfn>text formats</dfn> which is an array of [=text format=]. The array is initially empty.</li>
                 <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate=] system and the initial x, y, width, and height all 0.</li>
                 <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate=] system and the initial x, y, width, and height are all 0.</li>
                 <li><dfn>codepoint locations</dfn> which is an array of [=codepoint location=]. The array is initially empty.</li>
+            </ul>
+            <p><dfn>text format</dfn> is a struct that indicates decorative properties that should be applied to the ranges of [=text=].  The struct contains:</p>
+            <ul>
+                <li><dfn>rangeStart</dfn> which is an offset into [=text=] that respresents the position before the first codepoint that should be decorated.</li>
+                <li><dfn>rangeEnd</dfn> which is an offset into [=text=] that respresents the position after the last codepoint that should be decorated.</li>
+                <li><dfn>textColor</dfn> which is the prefered color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
+                <li><dfn>backgroundColor</dfn> which is the prefered background color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
+                <li><dfn>underlineStyle</dfn> which is the prefered underline style of the decorated [=text=] range. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
+                <li><dfn>underlineThickness</dfn> which is the prefered underline thickness of the decorated [=text=] range. The value is one of the following strings: "none", "thin", and "thick"</li>
+                <li><dfn>underlineColor</dfn> which is the prefered underline color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
             </ul>
             <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at an offset within [=text=] indicated by [=start index=].  The struct contains:</p>
             <ul>
@@ -139,7 +152,7 @@
                 [=Editing host=] may not be the best term to use to describe the impact of associating an {{EditContext}} with an {{HTMLElement}}.
                 It has similarities, such as making the {{HTMLElement}} the target for input events, but also differences in that the content of the [=editing host=] is not changed as a result of that input.
             </p>
-            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
+            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element, for which it is an [=editing host=], is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
             <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
 
