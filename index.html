@@ -96,7 +96,7 @@
             </p>
             <p>
                 To reflect changes made by the author to the [=active EditContext=] since the last lifecycle update, run the steps to [=update the Text Edit Context=] 
-                with the [=active EditContext=]'s [=text state=]'s [=text=], [=select start=], [=select end=], [=control bounds=], [=selection bounds=], and [=codepoint locations=].
+                with the [=active EditContext=]'s [=text state=]'s [=text=], [=selection start=], [=selection end=], [=control bounds=], [=selection bounds=], and [=codepoint locations=].
             </p>
             <p>
                 When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=] 
@@ -144,8 +144,8 @@
                 <li><dfn>character bounds updated flag</dfn> which is initially false.</li>
             </ul>
             <p>
-                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An [=editing host=] is an [=editable element=] which serves as the target for input events.  
-                Prior to the existence of {{EditContext}}, an [=editing host=] was limited to [=editable element=]s whose parents are not [=editable element=]s.
+                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An [=editing host=] is an editable element which serves as the target for input events.  
+                Prior to the existence of {{EditContext}}, an [=editing host=] was limited to editable elements whose parents are not editable elements.
                 With the introduction of {{EditContext}}, the definition is expanded to include any element associated with an {{EditContext}}.
             </p>
             <p class="note">
@@ -161,7 +161,7 @@
             <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
 
 
-            <p>Using an {{EditContext}}, an author can mark a region of the document [=editable=] by associating an {{EditContext}} object with an element as shown in the example below: </p>
+            <p>Using an {{EditContext}}, an author can mark a region of the document editable by associating an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
                 <pre><xmp><script type="module"> 
     let canvas = document.querySelector("canvas") 
@@ -779,10 +779,10 @@ interface EditContext : EventTarget {
             <dd>The {{EditContext/selectionBounds}} getter steps are to return [=this=]'s [=selection bounds=].</dd>
 
             <dt>characterBounds</dt>
-            <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=array of character bounds=].</dd>
+            <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=codepoint rects=].</dd>
 
             <dt>characterBoundsRangeStart</dt>
-            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=character bounds range start=].</dd>
+            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=start index=].</dd>
 
             <dt>updateText() method</dt>
             <dd>
@@ -848,7 +848,7 @@ interface EditContext : EventTarget {
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
-                        <dd>|selectionBounds|, a [=DOMRect=]</dd>
+                        <dd>|selectionBounds|, a {{DOMRect}}</dd>
                         <dt>Output</dt>
                         <dd>None</dd>
                     </dl>
@@ -870,7 +870,7 @@ interface EditContext : EventTarget {
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
-                        <dd>|controlBounds|, a [=DOMRect=]</dd>
+                        <dd>|controlBounds|, a {{DOMRect}}</dd>
                         <dt>Output</dt>
                         <dd>None</dd>
                     </dl>
@@ -893,7 +893,7 @@ interface EditContext : EventTarget {
                     <dl>
                         <dt>Input</dt>
                         <dd>|rangeStart|, an unsigned long</dd>
-                        <dd>|characterBounds|, an array of [=DOMRect=]</dd>
+                        <dd>|characterBounds|, an array of {{DOMRect}}</dd>
                         <dt>Output</dt>
                         <dd>None</dd>
                     </dl>
@@ -902,10 +902,10 @@ interface EditContext : EventTarget {
                             If [=this=] is not activated, abort these steps.
                         </li>
                         <li>
-                            set [=character bounds range start=] to |rangeStart|.
+                            set [=start index=] to |rangeStart|.
                         </li>
                         <li>
-                            set [=control bounds=] to |controlBounds|.
+                            set [=codepoint rects=] to |controlBounds|.
                         </li>
                     </ol>
                 </div>
