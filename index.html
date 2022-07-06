@@ -39,7 +39,7 @@
           , xref: ["WebIDL"
           , "DOM"
           , "HTML"
-          , "geometry-1"]
+		   , "geometry-1", "uievents"]
         };
     </script>
 </head>
@@ -455,40 +455,40 @@
         <p>If in a composition: </p>
         <ol>
             <li>
-                [=Fire an event=] named "beforeinput", if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
+                [=Fire an event=] named <a href="https://w3c.github.io/uievents/#beforeinput">beforeinput</a> using {{InputEvent}}, if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
             </li>
             <li>
                 Update the {{EditContext/text}}, {{EditContext/selectionStart}}, {{EditContext/selectionEnd}}, {{EditContext/compositionRangeStart}}, {{EditContext/compositionRangeEnd}}, and {{EditContext/isInComposition}} properties of the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "compositionstart" at the activated EditContext if it's a start of a composition.
+                [=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> using {{CompositionEvent}} at the activated EditContext if it's a start of a composition.
             </li>
             <li>
-                [=Fire an event=] named "textupdate" at the activated EditContext.
+                [=Fire an event=] named "textupdate" using {{TextUpdateEvent}} at the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "textformateupdate" at the activated EditContext.
+                [=Fire an event=] named "textformatupdate" using {{TextFormatUpdateEvent}} at the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "characterboundsupdate" at the activated EditContext.
+                [=Fire an event=] named "characterboundsupdate" using {{CharacterBoundsUpdateEvent}} at the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "compositionend" at the activated EditContext if it's an end of a composition.
+                [=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionend">compositionend</a> using {{CompositionEvent}} at the activated EditContext if it's an end of a composition.
             </li>
         </ol>
         <p>If not in a composition: </p>
         <ol>
             <li>
-                [=Fire an event=] named "beforeinput", if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
+                [=Fire an event=] named <a href="https://w3c.github.io/uievents/#beforeinput">beforeinput</a> using {{InputEvent}}, if applicable to the user text input, at the focused element. If the beforeinput event is cancelled, abort these steps.
             </li>
             <li>
                 Update the {{EditContext/text}}, {{EditContext/selectionStart}}, {{EditContext/selectionEnd}}, {{EditContext/compositionRangeStart}}, {{EditContext/compositionRangeEnd}}, and {{EditContext/isInComposition}} properties of the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "textupdate" at the activated EditContext.
+                [=Fire an event=] named "textupdate" using {{TextUpdateEvent}} at the activated EditContext.
             </li>
             <li>
-                [=Fire an event=] named "characterboundsupdate" at the activated EditContext.
+                [=Fire an event=] named "characterboundsupdate" using {{CharacterBoundsUpdateEvent}} at the activated EditContext.
             </li>
         </ol>
         <p>
