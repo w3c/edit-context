@@ -30,7 +30,8 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
 
     let anchorX = 0; // the anchor point of the composition
     let anchorY = 0;
-    let selection = 0; // selection i.e the index of the caret position
+    let selectionStart = 0;
+    let selectionEnd = 0;
 
     function renderCaret(x, y) {
         canvasContext2D.beginPath();
@@ -75,20 +76,22 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
         // rener texts in EditContext's buffer
         canvasContext2D.strokeText(editContext.text, anchorX, anchorY);
 
-        let caretX = anchorX + selection * charWidth;
-        let caretY = anchorY;
-        renderCaret(caretX, caretY);
+        if (selectionStart == selectionEnd) {
+            // if collpased selection, render the caret and update bounds for the caret.
+            let caretIndex = selectionStart;
+            let caretX = anchorX + caretIndex * charWidth;
+            let caretY = anchorY;
+            renderCaret(caretX, caretY);
 
-        // update layout info through EditContext so IME can show candidate window in the correct position.
+            let selectionBound = computeCharacterBound(caretIndex);
+            selectionBound.width = 1; // 1px caret
+            editContext.updateSelectionBounds(selectionBound);
+        } else {
+            // TODO: render the selection and update the selection bounds
+        }
+
         let controlBound = canvas.getBoundingClientRect();
-        selectoinClientX = caretX + canvas.offsetLeft;
-        selectoinClientY = caretY + canvas.offsetTop;
-        let selectionBound = DOMRect.fromRect({x:selectoinClientX, y:selectoinClientY, width:1, height:10});
-
-        controlBound = scaleDOMRect(controlBound, window.devicePixelRatio);
-        selectionBound = scaleDOMRect(selectionBound, window.devicePixelRatio);
-
-        editContext.updateBounds(controlBound, selectionBound);
+        editContext.updateControlBounds(controlBound);
     }
 
     // when EditContext is active (i.e. the associated element is focused)
@@ -96,7 +99,8 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
     editContext.addEventListener("textupdate", e => {
         console.log(`editcontext.text:[${editContext.text}]`);
         console.log(`textupdate:[${e.updateText}], composition range (${e.updateRangeStart}, ${e.updateRangeEnd}), selection (${e.newSelectionStart}, ${e.newSelectionEnd})`);
-        selection = e.newSelectionStart;
+        selectionStart = e.newSelectionStart;
+        selectionEnd = e.newSelectionEnd;
         render();
     });
 
@@ -118,7 +122,6 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
             let charBounds = [];
             for (offset = rangeStart; offset < rangeEnd; offset++) {
                 let bound = computeCharacterBound(offset);
-                bound = scaleDOMRect(bound, window.devicePixelRatio);
                 charBounds.push(bound);
             }
             editContext.updateCharacterBounds(rangeStart, charBounds);
@@ -151,13 +154,4 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
         anchorY = event.pageY - elemTop;
         render();
     });
-
-    // To handle zoom levels
-    function scaleDOMRect(rect, scale) {
-        rect.x = rect.x * scale;
-        rect.y = rect.y * scale;
-        rect.width = rect.width * scale;
-        rect.height = rect.height * scale;
-        return rect;
-    }
 </script>

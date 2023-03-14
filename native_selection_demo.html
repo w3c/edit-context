@@ -10,7 +10,7 @@
 <script>
     var editContext = new EditContext();
     editView.editContext = editContext;
-    editContext.text = editView.textContent;
+    editContext.updateText(0, 0, editView.textContent);
 
     let compositionNode = null;
     let compositionStartOffset = null
@@ -64,7 +64,8 @@
             controlBound = scaleDOMRect(controlBound, window.devicePixelRatio);
             let selectionBound = s.getRangeAt(0).getBoundingClientRect();
             selectionBound = scaleDOMRect(selectionBound, window.devicePixelRatio);
-            editContext.updateBounds(controlBound, selectionBound);
+            editContext.updateSelectionBounds(selectionBound);
+            editContext.updateControlBounds(controlBound);
 
             // Update decoration
             let range = document.createRange();
@@ -93,12 +94,44 @@
 
     document.addEventListener("selectionchange", e => {
         let s = document.getSelection();
-        console.log(`selectionchange:[anchorNode: ${s.anchorNode}: ${s.anchorOffset}], focusNode: ${s.focusNode}: ${s.focusOffset}]`);
+        console.log(`selectionchange: activeElement id(${document.activeElement.id}), [anchorNode: ${s.anchorNode}: ${s.anchorOffset}], focusNode: ${s.focusNode}: ${s.focusOffset}]`);
+        if (document.activeElement != editView)
+            return;
         // Update editContext using start/end info from the native selection. (here we assume anchor/focus node are the same)
         start = Math.min(s.anchorOffset, s.focusOffset);
         end = Math.max(s.anchorOffset, s.focusOffset);
         editContext.updateSelection(start, end);
         console.log('editContext.text[' + printEditContextBuffer() + ']');
+    });
+
+    function computeCharacterBound(offset) {
+        let range = document.createRange();
+        range.setStart(compositionNode, offset);
+        range.setEnd(compositionNode, offset + 1); // 1 character
+        return range.getBoundingClientRect();
+    }
+
+    editContext.addEventListener("characterboundsupdate", e => {
+        console.log(`editcontext.text:[${editContext.text}]`);
+        console.log(`characterboundsupdate: composition range (${e.rangeStart}, ${e.rangeEnd})`);
+        let rangeStart = e.rangeStart;
+        let rangeEnd = e.rangeEnd;
+
+        // Calculate bounds for each character in the range.
+        if (rangeEnd > rangeStart) {
+            let charBounds = [];
+            for (offset = rangeStart; offset < rangeEnd; offset++) {
+                let bound = computeCharacterBound(offset);
+                bound = scaleDOMRect(bound, window.devicePixelRatio);
+                charBounds.push(bound);
+            }
+            editContext.updateCharacterBounds(rangeStart, charBounds);
+
+            console.log("charcterBoundsRangeStart:");
+            console.log(editContext.characterBoundsRangeStart);
+            console.log("charcterBounds:");
+            console.log(editContext.characterBounds());
+        }
     });
 
     // To handle zoom levels
