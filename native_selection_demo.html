@@ -32,7 +32,15 @@
     }
 
     editContext.addEventListener("textupdate", e => {
-        console.log(`editContext::textupdate:[${e.updateText}], composition range (${e.updateRangeStart}, ${e.updateRangeEnd}), selection (${e.newSelectionStart}, ${e.newSelectionEnd})`);
+        // The standardized values are e.text, e.selectionStart, and e.selectionEnd.
+        // The Chromium implementation was recently switched [1] to these values, so for
+        // now keep handling the old values as that change rolls out.
+        // [1] https://chromium-review.googlesource.com/c/chromium/src/+/4370629
+        let text = e.updateText || e.text || '';
+        let selectionStart = e.newSelectionStart || e.selectionStart;
+        let selectionEnd = e.newSelectionEnd || e.selectionEnd;
+
+        console.log(`editContext::textupdate:[${text}], composition range (${e.updateRangeStart}, ${e.updateRangeEnd}), selection (${selectionStart}, ${selectionEnd})`);
         console.log('editContext.text[' + printEditContextBuffer() + ']');
 
         let s = document.getSelection();
@@ -43,9 +51,9 @@
             let textNode = s.anchorNode;
             let string = textNode.textContent;
             // update the text Node
-            textNode.textContent = string.substring(0, e.updateRangeStart) + e.updateText + string.substring(e.updateRangeEnd);
+            textNode.textContent = string.substring(0, e.updateRangeStart) + text + string.substring(e.updateRangeEnd);
             // update the caret
-            s.collapse(s.anchorNode, e.newSelectionStart);
+            s.collapse(s.anchorNode, selectionStart);
             console.log(`After textupdate: textContent[${s.anchorNode.textContent}]`);
     // Composition
         } else {
@@ -53,9 +61,9 @@
             console.log(`compositionNode[${compositionNode}], compositionStartOffset[${compositionStartOffset}], textContent[${compositionNode.textContent}]`);
             let string = compositionNode.textContent;
             // update the text Node
-            compositionNode.textContent = string.substring(0, compositionStartOffset) + e.updateText + string.substring(compositionStartOffset + compositionLength);
+            compositionNode.textContent = string.substring(0, compositionStartOffset) + text + string.substring(compositionStartOffset + compositionLength);
             // update the caret
-            let selectionLocalOffset = e.newSelectionStart - e.updateRangeStart;
+            let selectionLocalOffset = selectionStart - e.updateRangeStart;
             let selectionGlobalOffset = compositionStartOffset + selectionLocalOffset;
             s.collapse(compositionNode, selectionGlobalOffset);
 
@@ -70,7 +78,7 @@
             // Update decoration
             let range = document.createRange();
             range.setStart(compositionNode, compositionStartOffset);
-            const compositionEndOffset = compositionStartOffset + e.updateText.length;
+            const compositionEndOffset = compositionStartOffset + text.length;
             range.setEnd(compositionNode, compositionEndOffset);
             const clientRect = range.getBoundingClientRect();
             decoration.style.left = `${clientRect.x}px`;
