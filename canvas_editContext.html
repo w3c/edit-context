@@ -97,8 +97,16 @@ To try the "phrase" mode in Japanese IME (on Windows),<br>
     // when EditContext is active (i.e. the associated element is focused)
     // it'll receive textupdate events when there is user input.
     editContext.addEventListener("textupdate", e => {
+        // The standardized values are e.text, e.selectionStart, and e.selectionEnd.
+        // The Chromium implementation was recently switched [1] to these values, so for
+        // now keep handling the old values as that change rolls out.
+        // [1] https://chromium-review.googlesource.com/c/chromium/src/+/4370629
+        let text = e.updateText || e.text || '';
+        let selectionStart = e.newSelectionStart || e.selectionStart;
+        let selectionEnd = e.newSelectionEnd || e.selectionEnd;
+
         console.log(`editcontext.text:[${editContext.text}]`);
-        console.log(`textupdate:[${e.updateText}], composition range (${e.updateRangeStart}, ${e.updateRangeEnd}), selection (${e.newSelectionStart}, ${e.newSelectionEnd})`);
+        console.log(`textupdate:[${text}], composition range (${e.updateRangeStart}, ${e.updateRangeEnd}), selection (${selectionStart}, ${selectionEnd})`);
         selectionStart = e.newSelectionStart;
         selectionEnd = e.newSelectionEnd;
         render();
