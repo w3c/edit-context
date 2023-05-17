@@ -102,6 +102,7 @@
                 When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=] 
                 with the [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=], [=selection start=], [=selection end=], [=is composing=], [=composition start=], and [=composition end=].
             </p>
+            <h4>EditContext state</h4>
             <p>
                 Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=] which holds the information exchanged in the aforementioned updates. The <dfn>text state</dfn> consists of:
             </p>
@@ -143,6 +144,7 @@
                 <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
                 <li><dfn>character bounds updated flag</dfn> which is initially false.</li>
             </ul>
+            <h4>Association and activation</h4>
             <p>
                 Associating an {{EditContext}} to an element makes that element an [=editing host=].  An [=editing host=] is an editable element which serves as the target for input events.  
                 Prior to the existence of {{EditContext}}, an [=editing host=] was limited to editable elements whose parents are not editable elements.
@@ -159,8 +161,49 @@
             <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must not modify the DOM and must not fire any <a href=https://w3c.github.io/input-events>InputEvent</a>.</p>
             
             <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
-
-
+            
+            <h4>EditContext events</h4>
+            <p>
+                The user agent fires several types of events against the {{EditContext}} in order to
+                inform the author when they must update the state of the DOM in response to changes
+                from the [=Text Input Service=], or respond to a query from the [=Text Input Service=].
+                Since the timings of [=Text Input Service=]s are platform-specific, authors should
+                avoid taking dependencies on the timing of these events.
+            </p>
+            <ul>
+                <li>
+                    The user agent must fire {{TextUpdateEvent}} when the [=Text Input Service=] indicates
+                    that the user has made changes to the text, the selection, or the composition range
+                    properties of the EditContext. When the author receives this event, they must render
+                    the changes back to the page's view so the user can see what they are typing.
+                </li>
+                <li>
+                    The user agent must fire {{TextFormatUpdateEvent}} when the [=Text Input Service=]
+                    indicates that certain formats should be applied to the text being composed. When
+                    the author receives this event, they must render the formatting change back to
+                    the page's view to aid the user with their IME composition.</li>
+                <li>
+                    <p>
+                        The user agent must fire {{CharacterBoundsUpdateEvent}} when the
+                        [=Text Input Service=] indicates that it requires character bounds information
+                        to support the [=Text Input Method=] in properly displaying its user interface.
+                        After receiving {{CharacterBoundsUpdateEvent}}, the author must compute the
+                        requested character bounds and call {{EditContext/updateCharacterBounds}} to
+                        update the character bounds in the EditContext's [=text state=]. The author
+                        should perform the {{EditContext/updateCharacterBounds}} call synchronously
+                        within the {{CharacterBoundsUpdateEvent}} event handler if possible; if not,
+                        it is permissible to call it asynchronously.
+                        Upon receiving {{EditContext/updateCharacterBounds}}, the user agent must
+                        pass the character bounds information on to the [=Text Input Service=].
+                    </p>
+                    <p class="note">
+                        The longer the author delays the {{EditContext/updateCharacterBounds}} call,
+                        the higher the likelihood that the user will observe a visual stutter as the
+                        IME window repositions itself in the middle of a composition.
+                    </p>
+                </li>
+            </ul>
+            <h4>Examples</h4>
             <p>Using an {{EditContext}}, an author can mark a region of the document editable by associating an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
                 <pre><xmp><script type="module"> 
@@ -252,9 +295,7 @@
             
             <p>Input events against the DOM continue to describe the user’s intent</p>
             
-            <p>Against the EditContext, {{TextUpdateEvent}} describes changes to the text, the selection, and the composition range properties of the EditContext. {{TextFormatUpdateEvent}} describes changes to the style of the text. The updates received by the author’s code for text, selection, style, composition range changes should be rendered back to the canvas so the user can see what they are typing. {{CharacterBoundsUpdateEvent}} describes what character bounds are needed by the [=Text Input Service=] to support [=Text Input Method=] to properly display its user interface. After receiving {{CharacterBoundsUpdateEvent}}, the author is responsible to compute the requested character bounds and call {{EditContext/updateCharacterBounds}} to update the character bounds cached in the EditContext.</p>
-            
-            <p>Below example shows how to handle {{TextUpdateEvent}}, {{TextFormatUpdateEvent}}, and {{CharacterBoundsUpdateEvent}} to update the model and render the result to the canvas.</p>
+            <p>The below example shows how to handle {{TextUpdateEvent}}, {{TextFormatUpdateEvent}}, and {{CharacterBoundsUpdateEvent}} to update the model and render the result to the canvas.</p>
             <aside class="example" title="Event handlers for TextUpdateEvent, TextFormatUpdateEvent, and CharacterBoundsUpdateEvent">
                 <pre><xmp><script>
     // This example is built on top of example 1 and example 2.
