@@ -567,6 +567,7 @@
                             <dd>None</dd>
                         </dl>
                         <ol>
+                            <li>If [=this=]'s [=Element/local name=] is not a [=valid shadow host name=], then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
                             <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|</li>
                             <li>If |oldEditContext| is the [=active EditContext=]
@@ -972,59 +973,6 @@ interface EditContext : EventTarget {
             <dt>oncompositionend</dt>
             <dd><p>The event handler for the <a href='https://w3c.github.io/uievents/#event-type-compositionend'>compositionend</a> event.</p></dd>
         </dl>
-        <section>
-            <h3>Supported elements</h3>
-            <p>Below is the list of elements that can be associated with {{EditContext}}: abbr, 
-                address, 
-                article, 
-                aside, 
-                b, 
-                blockquote, 
-                canvas, 
-                cite, 
-                code, 
-                del, 
-                details, 
-                dfn, 
-                div, 
-                dl, dd, dt,  
-                em, 
-                footer, 
-                form, 
-                h1, 
-                h2, 
-                h3, 
-                h4, 
-                h5, 
-                h6, 
-                hgroup, 
-                i, 
-                ins, 
-                kbd, 
-                label, 
-                mark, 
-                object, 
-                ol, 
-                output, 
-                p, 
-                pre, 
-                q, 
-                ruby, 
-                s, 
-                samp, 
-                section, 
-                small, 
-                span, 
-                strong, 
-                sub, 
-                sup, 
-                table, 
-                time, 
-                u, and
-                ul.
-                </p>
-        </section>
-
     </section>
 
     <section data-dfn-for="EditContextEvents">
