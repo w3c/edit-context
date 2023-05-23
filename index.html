@@ -567,7 +567,7 @@
                             <dd>None</dd>
                         </dl>
                         <ol>
-                            <li>If [=this=]'s [=Element/local name=] is not a [=valid shadow host name=], then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
+                            <li>If [=this=]'s [=Element/local name=] is neither a [=valid shadow host name=] nor "<code>canvas</code>", then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
                             <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|</li>
                             <li>If |oldEditContext| is the [=active EditContext=]
