@@ -646,16 +646,15 @@
         <dd>None</dd>
     </dl>
     <ol>
-        <li>let editContext be the currently [=active EditContext=].</li>
-        <li>If editContext is null, abort these steps.</li>
-        <li>If editContext's [=dirty flag=] is false, abort these steps.</li>
-        <li>If editContext's [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
-        <li>If the [=active EditContext=] is no longer editContext, abort these steps.</li>
-        <li>let textState be editContext's [=text state=].</li>
-        <li>In parallel, update the [=Text Edit Context=]'s [=text state=] to match the values in textState.</li>
+        <li>Let |editContext| be the currently [=active EditContext=].</li>
+        <li>If |editContext| is null, abort these steps.</li>
+        <li>If |editContext|'s [=dirty flag=] is false, abort these steps.</li>
+        <li>If |editContext|'s [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
+        <li>If the [=active EditContext=] is no longer |editContext|, abort these steps.</li>
+        <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |editContext|'s [=text state=].</li>
     </ol>
     <p class="note">
-        Note the steps to update the [=Text Edit Context=]'s [=text state=] to match the values in textState is dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
+        Note that the steps to update the [=Text Edit Context=]'s [=text state=] are dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
         Those details are not part of this specification.
     </p>
 </div><!-- algorithm -->
