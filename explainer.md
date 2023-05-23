@@ -63,7 +63,7 @@ Additionally, the EditContext communicates events driven from text input UI to J
 
 This section describes the sequences of events that get fired on the EditContext and the focused element when IME is active. In this example, the user types 's' and 'u' in Japanese, then commits the first candidate '巣' by hitting 'Space'.
 
-|  Event                | EventTarget        |  key code            | event.updateText
+|  Event                | EventTarget        |  key code            | event.text
 | -------------         | -----------------  | -------------------  | -------------------
 |  keydown              | focused element    |  'S'                 |
 |  compositionstart     | active EditContext |                      |
@@ -86,9 +86,9 @@ This section describes the sequences of events that get fired on the EditContext
 dictionary TextUpdateEventInit {
     unsigned long updateRangeStart;
     unsigned long updateRangeEnd;
-    DOMString updateText;
-    unsigned long newSelectionStart;
-    unsigned long newSelectionEnd;
+    DOMString text;
+    unsigned long selectionStart;
+    unsigned long selectionEnd;
 };
 
 [Exposed=Window]
@@ -96,9 +96,9 @@ interface TextUpdateEvent : Event {
     constructor(optional TextUpdateEventInit options = {});
     readonly attribute unsigned long updateRangeStart;
     readonly attribute unsigned long updateRangeEnd;
-    readonly attribute DOMString updateText;
-    readonly attribute unsigned long newSelectionStart;
-    readonly attribute unsigned long newSelectionEnd;
+    readonly attribute DOMString text;
+    readonly attribute unsigned long selectionStart;
+    readonly attribute unsigned long selectionEnd;
 };
 
 dictionary TextFormatUpdateEventInit {
@@ -213,7 +213,7 @@ The following table summarizes the difference between div with contentEditable a
         let offset = s.anchorOffset;
         let string = textNode.textContent;
         // update the text Node
-        textNode.textContent = string.substring(0, offset) + e.updateText + string.substring(offset);
+        textNode.textContent = string.substring(0, offset) + e.text + string.substring(offset);
     });
 
     // EditContext will also receive textformatupdate event for IME decoration.
