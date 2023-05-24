@@ -352,11 +352,11 @@
     }
 
     class EditingController {
-        handleTextUpdate(updateRangeStart, updateRangeEnd, updateText, 
-                         newSelectionStart, newSelectionEnd,
+        handleTextUpdate(updateRangeStart, updateRangeEnd, text, 
+                         selectionStart, selectionEnd,
                          compositionStart, compositionEnd) {
-            this.model.updateText(updateRangeStart, updateRangeEnd, updatetext)
-            this.model.updateSelection(newSelectionStart, newSelectionEnd)
+            this.model.updateText(updateRangeStart, updateRangeEnd, text)
+            this.model.updateSelection(selectionStart, selectionEnd)
             this.model.updateCompositionRange(compositionStart, compositionEnd)
         }
 
@@ -370,11 +370,11 @@
         }
     }
 
-    // When user typing, EditContext will receive textupdate events,
+    // When the user is typing, EditContext will receive textupdate events,
     // which can be used to update the editor's model.
     editContext.addEventListener("textupdate", e => {
-        editingController.handleTextUpdate(e.updateRangeStart, e.updateRangeEnd, e.updatetext,
-                                        e.newSelectionStart, e.newSelectionEnd,
+        editingController.handleTextUpdate(e.updateRangeStart, e.updateRangeEnd, e.text,
+                                        e.selectionStart, e.selectionEnd,
                                         e.compositionStart, e.compositionEnd)
     });
 
@@ -583,10 +583,10 @@
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
-                        <dd>|newText|, a string</dd>
+                        <dd>|text|, a string</dd>
                         <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
-                        <dd>|newSelectionStart|, the new position for the start of the selection</dd>
-                        <dd>|newSelectionEnd|, the new position for the end of the selection</dd>
+                        <dd>|selectionStart|, the new position for the start of the selection</dd>
+                        <dd>|selectionEnd|, the new position for the end of the selection</dd>
                         <dd>|isComposing|, </dd>
                         <dd>|replacementRangeStart|, </dd>
                         <dd>|replacementRangeEnd|, </dd>
@@ -600,7 +600,7 @@
                     </ol>
                 </li>
                 <li>
-                    If |newText| is not empty and [=is composing=] is false
+                    If |text| is not empty and [=is composing=] is false
                     <ol>
                         <li>[=Fire an event=] named "compositionstart" at the activated {{EditContext}}.
                         </li>
@@ -608,7 +608,7 @@
                     </ol>
                 </li>
                 <li>
-                    If |newText| is empty and [=is composing=] is false
+                    If |text| is empty and [=is composing=] is false
                     <ol>
                         <li>Return</li>
                     </ol>
@@ -616,17 +616,17 @@
                 <li>
                     If [=composition start=] is 0 and [=composition end=] is 0
                     <ol>
-                        <li>Set [=composition start=] to |newSelectionStart|</li>
-                        <li>Set [=composition end=] to |newSelectionEnd|</li>
+                        <li>Set [=composition start=] to |selectionStart|</li>
+                        <li>Set [=composition end=] to |selectionEnd|</li>
                     </ol>
                 </li>
                 <li>
-                    Replace the substring of [=text=] in the range of [=composition start=] and [=composition end=] with |newText|
+                    Replace the substring of [=text=] in the range of [=composition start=] and [=composition end=] with |text|
                 </li>
-                <li>Set [=selection start=] to |newSelectionStart|</li>
-                <li>Set [=selection end=] to |newSelectionEnd|</li>
-                <li>[=Dispatch text update event=] with |newText|</li>
-                <li>Set [=composition end=] to [=composition start=] plus the length of |newText|</li>
+                <li>Set [=selection start=] to |selectionStart|</li>
+                <li>Set [=selection end=] to |selectionEnd|</li>
+                <li>[=Dispatch text update event=] with |text|</li>
+                <li>Set [=composition end=] to [=composition start=] plus the length of |text|</li>
                 <li>[=Dispatch text format update event=] with |textFormats|</li>
                 <li>[=Dispatch character bounds update event=]</li>
             </ol>
@@ -664,13 +664,13 @@
         <div class="algorithm">
             <dl>
                 <dt>Input</dt>
-                <dd>|newText|, a string</dd>
+                <dd>|text|, a string</dd>
                 <dt>Output</dt>
                 <dd>None</dd>
             </dl>
     <ol>
         <li>
-            Let |event| be a new {{TextUpdateEvent}} with |newText|, [=composition start=], [=composition end=], [=selection start=], and [=selection end=]
+            Let |event| be a new {{TextUpdateEvent}} with |text|, [=composition start=], [=composition end=], [=selection start=], and [=selection end=]
         </li>
         <li> [=Fire an event=] named "textupdate" with |event|</li>
     </ol>
