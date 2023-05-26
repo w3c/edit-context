@@ -603,7 +603,7 @@
                 <li>
                     If |text| is not empty and [=is composing=] is false
                     <ol>
-                        <li>[=Fire an event=] named "compositionstart" at the activated {{EditContext}}.
+                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> using {{CompositionEvent}} at the activated {{EditContext}}.
                         </li>
                         <li>set [=is composing=] to true</li>
                     </ol>
@@ -670,9 +670,13 @@
             </dl>
     <ol>
         <li>
-            Let |event| be a new {{TextUpdateEvent}} with |text|, [=composition start=], [=composition end=], [=selection start=], and [=selection end=]
+            [=Fire an event=] named "textupdate" using {{TextUpdateEvent}}, with
+            {{TextUpdateEvent/text}} initialized to |text|,
+            {{TextUpdateEvent/compositionStart}} initialized to [=composition start=],
+            {{TextUpdateEvent/compositionEnd}} initialized to [=composition end=],
+            {{TextUpdateEvent/selectionStart}} initialized to [=selection start=], and
+            {{TextUpdateEvent/selectionEnd}} initialized to [=selection end=].
         </li>
-        <li> [=Fire an event=] named "textupdate" with |event|</li>
     </ol>
     </div><!-- algorithm -->
 
@@ -716,9 +720,10 @@
     </dl>
 <ol>
 <li>
-    Let |event| be a new {{CharacterBoundsUpdateEvent}} with [=composition start=] and [=composition end=]
+    [=Fire an event=] named "characterboundsupdate" using {{CharacterBoundsUpdateEvent}} with
+    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to [=composition start=] and
+    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to [=composition end=].
 </li>
-<li> [=Fire an event=] named "characterboundsupdate" with |event|</li>
 </ol>
 </div><!-- algorithm -->
 
