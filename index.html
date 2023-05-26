@@ -706,7 +706,10 @@
             <li>Add |textFormat| to |formats|</li>
         </ol>
     </li>
-    <li> [=Fire an event=] named "textformatupdate" at the activated EditContext using {{TextFormatUpdateEvent}} with |formats|</li>
+    <li>
+        [=Fire an event=] named "textformatupdate" at the activated EditContext using {{TextFormatUpdateEvent}} with
+        the {{TextFormatUpdateEvent}}'s [=text format list=] initialized to |formats|.
+    </li>
 </ol>
 </div><!-- algorithm -->
 
@@ -1077,8 +1080,9 @@ interface TextFormatUpdateEvent : Event {
                 <dd>The {{TextFormat/underlineColor}} getter steps are to return [=this=]'s [=underlineColor=].</dd>
                 <dt>{{TextFormatUpdateEvent/getTextFormats}} method
                 </dt>
-                <dd>Returns [=this=]'s cached [=text formats=].</dd>
+                <dd>Returns [=this=]'s [=text format list=].</dd>
             </dl>
+            <p>A {{TextFormatUpdateEvent}} has an associated <dfn>text format list</dfn>, a list of zero or more [=text format=]s.</p>
         </section>
         <section>
             <h3>CharacterBoundsUpdateEvent</h3>
