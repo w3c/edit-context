@@ -43,7 +43,8 @@
           , xref: ["WebIDL"
           , "DOM"
           , "HTML"
-          , "geometry-1"]
+          , "geometry-1"
+          , "uievents"]
         };
     </script>
 </head>
@@ -603,7 +604,7 @@
                 <li>
                     If |text| is not empty and [=is composing=] is false
                     <ol>
-                        <li>[=Fire an event=] named "compositionstart" at the activated {{EditContext}}.
+                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at the [=active EditContext=] using {{CompositionEvent}}.
                         </li>
                         <li>set [=is composing=] to true</li>
                     </ol>
@@ -670,9 +671,13 @@
             </dl>
     <ol>
         <li>
-            Let |event| be a new {{TextUpdateEvent}} with |text|, [=composition start=], [=composition end=], [=selection start=], and [=selection end=]
+            [=Fire an event=] named "textupdate" at the [=active EditContext=] using {{TextUpdateEvent}}, with
+            {{TextUpdateEvent/text}} initialized to |text|,
+            {{TextUpdateEvent/compositionStart}} initialized to [=composition start=],
+            {{TextUpdateEvent/compositionEnd}} initialized to [=composition end=],
+            {{TextUpdateEvent/selectionStart}} initialized to [=selection start=], and
+            {{TextUpdateEvent/selectionEnd}} initialized to [=selection end=].
         </li>
-        <li> [=Fire an event=] named "textupdate" with |event|</li>
     </ol>
     </div><!-- algorithm -->
 
@@ -702,7 +707,10 @@
             <li>Add |textFormat| to |formats|</li>
         </ol>
     </li>
-    <li> [=Fire an event=] named "textformatupdate" at the activated EditContext using {{TextFormatUpdateEvent}} with |formats|</li>
+    <li>
+        [=Fire an event=] named "textformatupdate" at the [=active EditContext=] using {{TextFormatUpdateEvent}} with
+        the {{TextFormatUpdateEvent}}'s [=text format list=] initialized to |formats|.
+    </li>
 </ol>
 </div><!-- algorithm -->
 
@@ -716,9 +724,10 @@
     </dl>
 <ol>
 <li>
-    Let |event| be a new {{CharacterBoundsUpdateEvent}} with [=composition start=] and [=composition end=]
+    [=Fire an event=] named "characterboundsupdate" at the [=active EditContext=] using {{CharacterBoundsUpdateEvent}} with
+    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to [=composition start=] and
+    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to [=composition end=].
 </li>
-<li> [=Fire an event=] named "characterboundsupdate" with |event|</li>
 </ol>
 </div><!-- algorithm -->
 
@@ -1072,8 +1081,9 @@ interface TextFormatUpdateEvent : Event {
                 <dd>The {{TextFormat/underlineColor}} getter steps are to return [=this=]'s [=underlineColor=].</dd>
                 <dt>{{TextFormatUpdateEvent/getTextFormats}} method
                 </dt>
-                <dd>Returns [=this=]'s cached [=text formats=].</dd>
+                <dd>Returns [=this=]'s [=text format list=].</dd>
             </dl>
+            <p>A {{TextFormatUpdateEvent}} has an associated <dfn>text format list</dfn>, a list of zero or more [=text format=]s.</p>
         </section>
         <section>
             <h3>CharacterBoundsUpdateEvent</h3>
