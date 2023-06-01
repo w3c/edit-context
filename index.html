@@ -579,16 +579,25 @@
                         </dl>
                         <ol>
                             <li>If [=this=]'s [=Element/local name=] is neither a [=valid shadow host name=] nor "<code>canvas</code>", then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
-                            <li>If |editContext|'s <a>associated element</a> is equal to [=this=], then terminate these steps.
-                            <li>If |editContext|'s <a>associated element</a> is not null, then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
-                            <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
-                            <li>Set |oldEditContext|'s <a>associated element</a> to null.</li>
-                            <li>Set |editContext|'s <a>associated element</a> to [=this=].</li>
-                            <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|</li>
-                            <li>If |oldEditContext| is the [=active EditContext=]
+                            <li>If |editContext| is not null, then:
                                 <ol>
-                                    <li>Run the steps [=Deactivate an EditContext=] with |oldEditContext|</li>
-                                    <li>Run the steps to [=Activate an EditContext=] with |editContext|</li>
+                                    <li>If |editContext|'s <a>associated element</a> is equal to [=this=], then terminate these steps.</li>
+                                    <li>If |editContext|'s <a>associated element</a> is not null, then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
+                                    <li>Set |editContext|'s <a>associated element</a> to [=this=].</li>
+                                </ol>
+                            </li>
+                            <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
+                            <li>If |oldEditContext| is not null, then:
+                                <ol>
+                                    <li>Assert: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
+                                    <li>Set |oldEditContext|'s <a>associated element</a> to null.</li>
+                                </ol>
+                            </li>
+                            <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
+                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=active EditContext=], then:
+                                <ol>
+                                    <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
+                                    <li>If |editContext| is not null, run the steps to [=activate an EditContext=] with |editContext|.</li>
                                 </ol>
                             </li>
                         </ol>
