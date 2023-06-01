@@ -44,7 +44,8 @@
           , "DOM"
           , "HTML"
           , "geometry-1"
-          , "uievents"]
+          , "uievents"
+          , "infra"]
         };
     </script>
 </head>
@@ -589,7 +590,7 @@
                             <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
                             <li>If |oldEditContext| is not null, then:
                                 <ol>
-                                    <li>Assert: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
+                                    <li>[=Assert=]: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
                                     <li>Set |oldEditContext|'s <a>associated element</a> to null.</li>
                                 </ol>
                             </li>
