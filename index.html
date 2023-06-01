@@ -44,7 +44,8 @@
           , "DOM"
           , "HTML"
           , "geometry-1"
-          , "uievents"]
+          , "uievents"
+          , "infra"]
         };
     </script>
 </head>
@@ -147,17 +148,27 @@
             </ul>
             <h4>Association and activation</h4>
             <p>
-                Associating an {{EditContext}} to an element makes that element an [=editing host=].  An [=editing host=] is an editable element which serves as the target for input events.  
+                An {{EditContext}} has an <dfn data-for="edit-context">associated element</dfn>, an {{HTMLElement}}.
+                An element becomes an {{EditContext}}'s <a>associated element </a>by assigning
+                the {{EditContext}} to the element's {{HTMLElement/editContext}} property.
+                An {{HTMLElement}} can be <a data-lt="associated element">associated</a> with at most one {{EditContext}}.
+            </p>
+            <p class="issue">
+                Should we enable authors to <a data-lt="associated element">associate</a> an {{EditContext}} with multiple elements?
+                This could be useful for multipage editing scenarios where different pages are represented by different elements in the DOM.
+            </p>
+            <p>
+                Becoming an {{EditContext}}'s <a>associated element</a> makes that element an [=editing host=].  An [=editing host=] is an editable element which serves as the target for input events.  
                 Prior to the existence of {{EditContext}}, an [=editing host=] was limited to editable elements whose parents are not editable elements.
-                With the introduction of {{EditContext}}, the definition is expanded to include any element associated with an {{EditContext}}.
+                With the introduction of {{EditContext}}, the definition is expanded to include any element <a data-lt="associated element">associated</a> with an {{EditContext}}.
             </p>
             <p class="note">
-                [=Editing host=] may not be the best term to use to describe the impact of associating an {{EditContext}} with an {{HTMLElement}}.
+                [=Editing host=] may not be the best term to use to describe the impact of </a data-lt="associated element">associating</a> an {{EditContext}} with an {{HTMLElement}}.
                 It has similarities, such as making the {{HTMLElement}} the target for input events, but also differences in that the content of the [=editing host=] is not changed as a result of that input.
             </p>
-            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its associated element, or a descendant of its associated element, is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
+            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its <a>associated element</a>, or a descendant of its <a>associated element</a>, is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
             <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
-            <p>If an element associated with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
+            <p>If an element <a data-lt="associated element">associated</a> with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
 
             <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must not modify the DOM and must not fire any <a href=https://w3c.github.io/input-events>InputEvent</a>.</p>
             
@@ -205,7 +216,7 @@
                 </li>
             </ul>
             <h4>Examples</h4>
-            <p>Using an {{EditContext}}, an author can mark a region of the document editable by associating an {{EditContext}} object with an element as shown in the example below: </p>
+            <p>Using an {{EditContext}}, an author can mark a region of the document editable by <a data-lt="associated element">associating</a> an {{EditContext}} object with an element as shown in the example below: </p>
             <aside class="example" title="Associate an EditContext with an Element">
                 <pre><xmp><script type="module"> 
     let canvas = document.querySelector("canvas") 
@@ -215,7 +226,7 @@
 </script>
 <canvas></canvas></xmp></pre></aside>
 
-            <p>In the example below, the author is using a canvas to draw an editable region that allows the user to input a single line of text rendered with a monospace font.  The text for the editable region is maintained by the author as a String.  The text offsets for the selection in the editable region are maintained by the author as a pair of Numbers: selectionStart and selectionEnd.  The Numbers refer to the count of the number of UTF-16 codepoints to the left of the start and end of the selection respectively.  For the sake of communicating the bounding boxes for the current selection and the editable region of the document to Text Input Services, the author also computes the bounding rectangle in CSS pixels for the selection and the editable region of the document. The offset of the rectangle is expressed relative to the origin of the canvas element since that is the element to which the author has associated an EditContext. Since the model for the author’s representation of text and selection location matches the form expected by the EditContext API, the author can simply assign those properties to the EditContext associated with the canvas whenever those values change. </p>
+            <p>In the example below, the author is using a canvas to draw an editable region that allows the user to input a single line of text rendered with a monospace font.  The text for the editable region is maintained by the author as a String.  The text offsets for the selection in the editable region are maintained by the author as a pair of Numbers: selectionStart and selectionEnd.  The Numbers refer to the count of the number of UTF-16 codepoints to the left of the start and end of the selection respectively.  For the sake of communicating the bounding boxes for the current selection and the editable region of the document to Text Input Services, the author also computes the bounding rectangle in CSS pixels for the selection and the editable region of the document. The offset of the rectangle is expressed relative to the origin of the canvas element since that is the element to which the author has <a data-lt="associated element">associated</a> an EditContext. Since the model for the author’s representation of text and selection location matches the form expected by the EditContext API, the author can simply assign those properties to the EditContext <a data-lt="associated element">associated</a> with the canvas whenever those values change. </p>
 
             <aside class="example" title="Using EditContext with editing model, view, and controller">
                 <pre><xmp><script type="module">
@@ -569,12 +580,25 @@
                         </dl>
                         <ol>
                             <li>If [=this=]'s [=Element/local name=] is neither a [=valid shadow host name=] nor "<code>canvas</code>", then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
-                            <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
-                            <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|</li>
-                            <li>If |oldEditContext| is the [=active EditContext=]
+                            <li>If |editContext| is not null, then:
                                 <ol>
-                                    <li>Run the steps [=Deactivate an EditContext=] with |oldEditContext|</li>
-                                    <li>Run the steps to [=Activate an EditContext=] with |editContext|</li>
+                                    <li>If |editContext|'s <a>associated element</a> is equal to [=this=], then terminate these steps.</li>
+                                    <li>If |editContext|'s <a>associated element</a> is not null, then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
+                                    <li>Set |editContext|'s <a>associated element</a> to [=this=].</li>
+                                </ol>
+                            </li>
+                            <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
+                            <li>If |oldEditContext| is not null, then:
+                                <ol>
+                                    <li>[=Assert=]: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
+                                    <li>Set |oldEditContext|'s <a>associated element</a> to null.</li>
+                                </ol>
+                            </li>
+                            <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
+                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=active EditContext=], then:
+                                <ol>
+                                    <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
+                                    <li>If |editContext| is not null, run the steps to [=activate an EditContext=] with |editContext|.</li>
                                 </ol>
                             </li>
                         </ol>
@@ -961,9 +985,12 @@ interface EditContext : EventTarget {
                 </div>
               </dd>
             <dt>attachedElements() method</dt>
-            <dd><p>The method returns elements that are associated with the EditContext.</p></dd>
+            <dd><p>The method returns a list with one item which is the the {{EditContext}}'s <a>associated element</a>, or an empty list if the {{EditContext}}'s <a>associated element</a> is null.</p></dd>
+            <p class="note">
+                This method returns a list instead of a single element for forward compatibility if in the future grant the ability for an {{EditContext}} to have multiple <a>associated elements</a>.
+            </p>
             <p class="issue">
-                should attachedElements() return elements that are removed from the tree? If yes, the EditContext will keep removed elements alive. If not, we probably shouldn't allow a disconnected element to associate with EditContext, otherwise, it would be confusing/unintuitive that we allow it but attachedElements returns empty.
+                Should attachedElements() return elements that are removed from the tree? If yes, the EditContext will keep removed elements alive. If not, we probably shouldn't allow a disconnected element to <a data-lt="associated element">associate</a> with EditContext, otherwise, it would be confusing/unintuitive that we allow it but attachedElements returns empty.
             </p>
             
             <dt>ontextupdate</dt>
