@@ -164,9 +164,18 @@
                 As such, the element will receive the behaviors of an [=editing host=] that are defined
                 in other specifications, except where noted in [[[#edit-context-differences]]].
 
-                <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its <a>associated element</a>, or a descendant of its <a>associated element</a>, is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
-                <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
-                <p>If an element <a data-lt="associated element">associated</a> with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
+                <p>
+                    A [=top-level traversable=] should have at most one <dfn>active EditContext</dfn>, which is determined
+                    by running the steps to [=determine the active EditContext=] for that [=top-level traversable=].
+                </p>
+                <p>
+                    When an {{EditContext}} that was previously the [=active EditContext=] stops being
+                    the [=active EditContext=], run the steps to [=deactivate an EditContext=]
+                    on that {{EditContext}}.
+                </p>
+                <p class="issue">
+                    When, exactly? Do we need a step for this in the Event Loop?
+                </p>
                 
                 <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
             </p>
@@ -823,6 +832,42 @@
             <div class="note">Add details</div>
         </li>
     </ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Determine the active EditContext</dfn></h4>
+<div class="algorithm">
+    <dl>
+        <dt>Input</dt>
+        <dd>|traversable|, a [=top-level traversable=]</dd>
+        <dt>Output</dt>
+        <dd>An {{EditContext}}, or null.</dd>
+    </dl>
+    <ol>
+        <li>
+            Let |focused| be the <a href="https://html.spec.whatwg.org/multipage/interaction.html#dom-anchor">DOM anchor</a>
+            of the <a href="https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-traversable">currently focused area of a top-level traversable</a>
+            given |traversable|.
+        </li>
+        <li>Let |editContext| be null.</li>
+        <li>While |focused| is not null and |focused| is <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>:
+            <ol>
+                <li>Set |editContext| to the value of |focused|'s internal [[\EditContext]] slot.</li>
+                <li>Let |parent| be |focused|'s <a href="https://dom.spec.whatwg.org/#concept-tree-parent">parent</a>.</li>
+                <li>
+                    If |parent| is null and |focused|'s <a href="https://dom.spec.whatwg.org/#concept-tree-root">root</a>
+                    is a [=shadow root=], let |parent| be |focused|'s
+                    <a href="https://dom.spec.whatwg.org/#concept-tree-root">root</a>'s
+                    <a href="https://dom.spec.whatwg.org/#concept-documentfragment-host">host</a>.
+                </li>
+            </ol>
+        </li>
+        <li>Return |editContext|.</li>
+    </ol>
+    <p class="note">
+        If an {{EditContext}}'s [=associated element=]'s parent is editable, that {{EditContext}}
+        can't become the [=active EditContext=]. This is the case regardless of whether that
+        parent is editable due to another {{EditContext}} or due to [^html-global/contenteditable^].
+    </p>
 </div><!-- algorithm -->
 
         </section>
