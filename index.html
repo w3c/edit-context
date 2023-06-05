@@ -158,21 +158,70 @@
                 This could be useful for multipage editing scenarios where different pages are represented by different elements in the DOM.
             </p>
             <p>
-                Becoming an {{EditContext}}'s <a>associated element</a> makes that element an [=editing host=].  An [=editing host=] is an editable element which serves as the target for input events.  
-                Prior to the existence of {{EditContext}}, an [=editing host=] was limited to editable elements whose parents are not editable elements.
-                With the introduction of {{EditContext}}, the definition is expanded to include any element <a data-lt="associated element">associated</a> with an {{EditContext}}.
-            </p>
-            <p class="note">
-                [=Editing host=] may not be the best term to use to describe the impact of </a data-lt="associated element">associating</a> an {{EditContext}} with an {{HTMLElement}}.
-                It has similarities, such as making the {{HTMLElement}} the target for input events, but also differences in that the content of the [=editing host=] is not changed as a result of that input.
-            </p>
-            <p>A user agent should have at most one <dfn>active EditContext</dfn>.  An {{EditContext}} is active when its <a>associated element</a>, or a descendant of its <a>associated element</a>, is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>.</p>
-            <p>When an {{EditContext}} meets the criteria above, it must be made the [=active EditContext=] by running the steps to [=activate an EditContext=].</p>
-            <p>If an element <a data-lt="associated element">associated</a> with an [=active EditContext=] no longer meets the criteria outlined above, run the steps to [=deactivate an EditContext=].</p>
+                The definition of an [=editing host=] will be modified so that an {{EditContext}}'s
+                <a>associated element</a> is also an [=editing host=], unless that element's parent is
+                <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>.
+                As such, the element will receive the behaviors of an [=editing host=] that are defined
+                in other specifications, except where noted in [[[#edit-context-differences]]].
 
-            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must not modify the DOM and must not fire any <a href=https://w3c.github.io/input-events>InputEvent</a>.</p>
-            
-            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
+                <p>
+                    A [=top-level traversable=] should have at most one <dfn>active EditContext</dfn>, which is determined
+                    by running the steps to [=determine the active EditContext=] for that [=top-level traversable=].
+                </p>
+                <p>
+                    When an {{EditContext}} that was previously the [=active EditContext=] stops being
+                    the [=active EditContext=], run the steps to [=deactivate an EditContext=]
+                    on that {{EditContext}}.
+                </p>
+                <p class="issue">
+                    When, exactly? Do we need a step for this in the Event Loop?
+                </p>
+                
+                <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
+            </p>
+            <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
+            <p>
+                <p>
+                    In many ways, an [=editing host=] that's <a data-lt="associated element">associated</a> with an {{EditContext}}
+                    behaves in the same way as an [=editing host=] for a [^html-global/contenteditable^] element. Notable similarities include:
+                </p>
+                <ul>
+                    <li>
+                        Each child node of the [=editing host=] becomes <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
+                        unless that node has a [^html-global/contenteditable^] attribute set to "<code>false</code>".
+                    </li>
+                    <li>The user agent handles focus and caret navigation for any editable element in the [=editing host=].</li>
+                    <li>
+                        The [=editing host=] receives key events and the <a href="https://www.w3.org/TR/uievents/#event-type-beforeinput">beforeinput</a>
+                        event as specified in [[uievents]].
+                    </li>
+                </ul>
+
+                <p>
+                    There are also some ways that an [=editing host=] that's <a data-lt="associated element">associated</a> with an {{EditContext}}
+                    differs from other [=editing hosts=]:
+                </p>
+                <ul>
+                    <li>
+                        When there is an [=active EditContext=], the user agent must not update the DOM
+                        as a direct result of a user action in the [=editing host=]
+                        (e.g., keyboard input in an editable region, deleting or formatting text, ...).
+                    </li>
+                    <li>
+                        When there is an [=active EditContext=], the user agent must not fire the
+                        <a href="https://www.w3.org/TR/uievents/#event-type-input">input</a> event
+                        against the [=editing host=] as a direct result of user action
+                        event as specified in [[uievents]].
+                    </li>
+                </ul>
+
+                <p class="note">
+                    Given these differences, [=Editing host=] may not be the best term to use to describe the
+                    impact of </a data-lt="associated element">associating</a> an {{EditContext}} with an {{HTMLElement}}.
+                    If the complexity of managing these differences outweighs the convenience of having the concepts grouped together,
+                    we can perform a split into two types of [=editing hosts=].
+                </p>
+            </p>
             
             <h4>EditContext events</h4>
             <p>
@@ -783,6 +832,43 @@
             <div class="note">Add details</div>
         </li>
     </ol>
+</div><!-- algorithm -->
+
+<h4><dfn>Determine the active EditContext</dfn></h4>
+<div class="algorithm">
+    <dl>
+        <dt>Input</dt>
+        <dd>|traversable|, a [=top-level traversable=]</dd>
+        <dt>Output</dt>
+        <dd>An {{EditContext}}, or null.</dd>
+    </dl>
+    <ol>
+        <li>
+            Let |focused| be the <a href="https://html.spec.whatwg.org/multipage/interaction.html#dom-anchor">DOM anchor</a>
+            of the <a href="https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-traversable">currently focused area of a top-level traversable</a>
+            given |traversable|.
+        </li>
+        <li>Let |editContext| be null.</li>
+        <li>While |focused| is not null and |focused| is <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>:
+            <ol>
+                <li>Set |editContext| to the value of |focused|'s internal [[\EditContext]] slot.</li>
+                <li>Let |parent| be |focused|'s <a href="https://dom.spec.whatwg.org/#concept-tree-parent">parent</a>.</li>
+                <li>
+                    If |parent| is null and |focused|'s <a href="https://dom.spec.whatwg.org/#concept-tree-root">root</a>
+                    is a [=shadow root=], let |parent| be |focused|'s
+                    <a href="https://dom.spec.whatwg.org/#concept-tree-root">root</a>'s
+                    <a href="https://dom.spec.whatwg.org/#concept-documentfragment-host">host</a>.
+                </li>
+                <li>Set |focused| to |parent|.</li>
+            </ol>
+        </li>
+        <li>Return |editContext|.</li>
+    </ol>
+    <p class="note">
+        If an {{EditContext}}'s [=associated element=]'s parent is editable, that {{EditContext}}
+        can't become the [=active EditContext=]. This is the case regardless of whether that
+        parent is editable due to another {{EditContext}} or due to [^html-global/contenteditable^].
+    </p>
 </div><!-- algorithm -->
 
         </section>
