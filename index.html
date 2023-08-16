@@ -154,71 +154,86 @@
                 An {{HTMLElement}} can be <a data-lt="associated element">associated</a> with at most one {{EditContext}}.
             </p>
             <p>
-                The definition of an [=editing host=] will be modified so that an {{EditContext}}'s
-                <a>associated element</a> is also an [=editing host=], unless that element's parent is
-                <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>.
-                As such, the element will receive the behaviors of an [=editing host=] that are defined
-                in other specifications, except where noted in [[[#edit-context-differences]]].
-
-                <p>
-                    A [=top-level traversable=] should have at most one <dfn>active EditContext</dfn>, which is determined
-                    by running the steps to [=determine the active EditContext=] for that [=top-level traversable=].
-                </p>
-                <p>
-                    When an {{EditContext}} that was previously the [=active EditContext=] stops being
-                    the [=active EditContext=], run the steps to [=deactivate an EditContext=]
-                    on that {{EditContext}}.
-                </p>
-                <p class="issue">
-                    When, exactly? Do we need a step for this in the Event Loop?
-                </p>
-                
-                <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
+                If an {{EditContext}}'s <a>associated element</a>'s parent is not
+                <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
+                then the <a>associated element</a> becomes an <dfn>EditContext editing host</dfn>.
+                An <a>EditContext editing host</a> is a type of [=editing host=] whose behaviors
+                are described in [[[#edit-context-differences]]].
             </p>
+            <div class="note">
+                <p>
+                    There are a couple implications of this. Firstly, if an element that is already
+                    an [=editing host=] due to [^html-global/contenteditable^]
+                    becomes an {{EditContext}}'s <a>associated element</a>, then that element
+                    becomes an <a>EditContext editing host</a>. In other words, if both {{EditContext}}
+                    and [^html-global/contenteditable^] are set on an element, the EditContext
+                    behavior "wins".
+                </p>
+                <p>
+                    Secondly, if an element is
+                    <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>
+                    but not an [=editing host=] (i.e. it is a child in the subtree of an
+                    [=editing host=]), then becoming an {{EditContext}}'s <a>associated element</a>
+                    has no effect on that element. This is analogous to the behavior of
+                    [^html-global/contenteditable^], where setting [^html-global/contenteditable^]
+                    to "<code>true</code>" on an
+                    <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>
+                    element that is not an [=editing host=] has no effect. Taken together, these
+                    rules imply that an editable tree of nodes will follow either the
+                    {{EditContext}} behavior or non-{{EditContext}} behavior, but the behaviors
+                    cannot be mixed.
+                </p>
+            </div>
+            <p>
+                A [=top-level traversable=] should have at most one <dfn>active EditContext</dfn>, which is determined
+                by running the steps to [=determine the active EditContext=] for that [=top-level traversable=].
+            </p>
+            <p>
+                When an {{EditContext}} that was previously the [=active EditContext=] stops being
+                the [=active EditContext=], run the steps to [=deactivate an EditContext=]
+                on that {{EditContext}}.
+            </p>
+            <p class="issue">
+                When, exactly? Do we need a step for this in the Event Loop?
+            </p>
+            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
             <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
             <p>
                 <p>
-                    In many ways, an [=editing host=] that's <a data-lt="associated element">associated</a> with an {{EditContext}}
-                    behaves in the same way as an [=editing host=] for a [^html-global/contenteditable^] element. Notable similarities include:
+                    In many ways, an <a>EditContext editing host</a> behaves in the same way as other types of [=editing host=], 
+                    e.g. for a [^html-global/contenteditable^] element. Notable similarities include:
                 </p>
                 <ul>
                     <li>
-                        Each child node of the [=editing host=] becomes <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
+                        Each child node of the <a>EditContext editing host</a> becomes <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
                         unless that node has a [^html-global/contenteditable^] attribute set to "<code>false</code>".
                     </li>
-                    <li>The user agent handles focus and caret navigation for any editable element in the [=editing host=].</li>
+                    <li>The user agent handles focus and caret navigation for any editable element in the <a>EditContext editing host</a>.</li>
                     <li>
-                        The [=editing host=] receives key events and the <a href="https://www.w3.org/TR/uievents/#event-type-beforeinput">beforeinput</a>
+                        The <a>EditContext editing host</a> receives key events and the <a href="https://www.w3.org/TR/uievents/#event-type-beforeinput">beforeinput</a>
                         event as specified in [[uievents]].
                     </li>
                 </ul>
 
                 <p>
-                    There are also some ways that an [=editing host=] that's <a data-lt="associated element">associated</a> with an {{EditContext}}
-                    differs from other [=editing hosts=]:
+                    There are also some ways that an <a>EditContext editing host</a>
+                    differs from other types of [=editing hosts=]:
                 </p>
                 <ul>
                     <li>
                         When there is an [=active EditContext=], the user agent must not update the DOM
-                        as a direct result of a user action in the [=editing host=]
+                        as a direct result of a user action in the <a>EditContext editing host</a>
                         (e.g., keyboard input in an editable region, deleting or formatting text, ...).
                     </li>
                     <li>
                         When there is an [=active EditContext=], the user agent must not fire the
                         <a href="https://www.w3.org/TR/uievents/#event-type-input">input</a> event
-                        against the [=editing host=] as a direct result of user action
+                        against the <a>EditContext editing host</a> as a direct result of user action
                         event as specified in [[uievents]].
                     </li>
                 </ul>
-
-                <p class="note">
-                    Given these differences, [=Editing host=] may not be the best term to use to describe the
-                    impact of </a data-lt="associated element">associating</a> an {{EditContext}} with an {{HTMLElement}}.
-                    If the complexity of managing these differences outweighs the convenience of having the concepts grouped together,
-                    we can perform a split into two types of [=editing hosts=].
-                </p>
             </p>
-            
+
             <h4>EditContext events</h4>
             <p>
                 The user agent fires several types of events against the {{EditContext}} in order to
