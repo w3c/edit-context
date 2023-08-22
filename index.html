@@ -354,7 +354,7 @@
             // These bounds have x, y, width and height members  
             // so they can be assigned directly to EditContext.
             editContext.updateSelectionBounds(selectionBounds)
-            editContext.updateControlBoundss(controlBounds)
+            editContext.updateControlBounds(controlBounds)
         }
     }
 
@@ -969,11 +969,6 @@ interface EditContext : EventTarget {
     readonly attribute DOMString text;
     readonly attribute unsigned long selectionStart;
     readonly attribute unsigned long selectionEnd;
-    readonly attribute unsigned long compositionRangeStart;
-    readonly attribute unsigned long compositionRangeEnd;
-    readonly attribute boolean isComposing;
-    readonly attribute DOMRect controlBounds;
-    readonly attribute DOMRect selectionBounds;
     readonly attribute unsigned long characterBoundsRangeStart;
     sequence<DOMRect> characterBounds();
 
@@ -992,25 +987,6 @@ interface EditContext : EventTarget {
 
             <dt>selectionEnd</dt>
             <dd>The {{EditContext/selectionEnd}} getter steps are to return [=this=]'s [=selection end=].</dd>
-
-            <dt>compositionRangeStart</dt>
-            <dd>The {{EditContext/compositionRangeStart}} getter steps are to return [=this=]'s [=composition start=].</dd>
-
-            <dt>compositionRangeEnd</dt>
-            <dd>The {{EditContext/compositionRangeEnd}} getter steps are to return [=this=]'s [=composition end=].</dd>
-
-            <dt>isComposing</dt>
-            <dd>The {{EditContext/isComposing}} getter steps are to return [=this=]'s [=is composing=].</dd>
-
-            <dt>controlBounds</dt>
-            <dd>The {{EditContext/controlBounds}} getter steps are to return [=this=]'s [=control bounds=].</dd>
-
-<p class="note">
-    The control bound may be used by the OS for hittesting to trigger the virtual keyboard.
-</p>
-
-            <dt>selectionBounds</dt>
-            <dd>The {{EditContext/selectionBounds}} getter steps are to return [=this=]'s [=selection bounds=].</dd>
 
             <dt>characterBounds</dt>
             <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=codepoint rects=].</dd>
@@ -1139,7 +1115,7 @@ interface EditContext : EventTarget {
                             set [=start index=] to |rangeStart|.
                         </li>
                         <li>
-                            set [=codepoint rects=] to |controlBounds|.
+                            set [=codepoint rects=] to |characterBounds|.
                         </li>
                     </ol>
                 </div>
