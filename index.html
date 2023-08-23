@@ -172,7 +172,7 @@
                 </p>
             </div>
             <p>
-                A <a href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a> has an <dfn>active EditContext</dfn>, which may be null.
+                A {{Document}} has an <dfn>active EditContext</dfn>, which may be null.
             </p>
             <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
             <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
@@ -255,13 +255,13 @@
             </ul>
             <h4>Event loop changes</h4>
             <p>
-                A new step will be introduced as a substep within the [=Update the rendering=] step in the HTML Event Loops Processing Model,
-                immediately following step 15 that runs the focusing steps for
-                <a href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a>s
-                whose focused areas become non-focusable.
+                A new step will be introduced as a substep within the [=Update the rendering=] step
+                in the HTML Event Loops Processing Model, immediately following step 15 (which runs
+                the focusing steps for {{Document}}s whose focused areas become non-focusable).
                 The step is: For each
                 <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active">fully active</a>
-                <a href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a> |doc|, run
+                {{Document}} |doc|, [=queue a global task=] on the [=DOM manipulation task source=]
+                given |doc|'s [=relevant global object=] to run
                 the [=Update the Text Edit Context=] steps given |doc|.
             </p>
             <section id="examples" class="informative">
@@ -712,7 +712,7 @@
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>|document|, a <a href="https://html.spec.whatwg.org/multipage/dom.html#document">Document</a></dd>
+        <dd>|document|, a {{Document}}</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
