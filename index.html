@@ -174,7 +174,14 @@
             <p>
                 A {{Document}} has an <dfn>active EditContext</dfn>, which may be null.
             </p>
-            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
+            <p>
+                When a {{Document}} receives text input from the [=Text Input Service=] and that
+                {{Document}} has a non-null [=active EditContext=] |editContext|, the user agent
+                must run [=Update the EditContext=] given |editContext| and the
+                [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=],
+                [=selection start=], [=selection end=], [=is composing=], [=composition start=],
+                and [=composition end=].
+            </p>
             <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
             <p>
                 <p>
@@ -199,12 +206,12 @@
                 </p>
                 <ul>
                     <li>
-                        When there is an [=active EditContext=], the user agent must not update the DOM
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not update the DOM
                         as a direct result of a user action in the <a>EditContext editing host</a>
                         (e.g., keyboard input in an editable region, deleting or formatting text, ...).
                     </li>
                     <li>
-                        When there is an [=active EditContext=], the user agent must not fire the
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not fire the
                         <a href="https://www.w3.org/TR/uievents/#event-type-input">input</a> event
                         against the <a>EditContext editing host</a> as a direct result of user action
                         event as specified in [[uievents]].
@@ -645,7 +652,8 @@
                                 </ol>
                             </li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
-                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=active EditContext=], then:
+                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=this=]'s
+                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s [=active EditContext=], then:
                                 <ol>
                                     <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
                                     <li>If |editContext| is not null, run the steps to [=activate an EditContext=] with |editContext|.</li>
@@ -659,6 +667,7 @@
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
+                        <dd>|editContext|, an {{EditContext}}</dd>
                         <dd>|text|, a string</dd>
                         <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
                         <dd>|selectionStart|, the new position for the start of the selection</dd>
@@ -670,41 +679,36 @@
                         <dd>None</dd>
                     </dl>
             <ol>
-                <li>If the [=active EditContext=] != cached active EditContext
-                    <ol>
-                        <li>Return</li>
-                    </ol>
-                </li>
                 <li>
-                    If |text| is not empty and [=is composing=] is false
+                    If |text| is not empty and |editContext|'s [=is composing=] is false.
                     <ol>
-                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at the [=active EditContext=] using {{CompositionEvent}}.
+                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at |editContext| using {{CompositionEvent}}.
                         </li>
-                        <li>set [=is composing=] to true</li>
+                        <li>set |editContext|'s [=is composing=] to true.</li>
                     </ol>
                 </li>
                 <li>
-                    If |text| is empty and [=is composing=] is false
+                    If |text| is empty and |editContext|'s [=is composing=] is false
                     <ol>
-                        <li>Return</li>
+                        <li>Return.</li>
                     </ol>
                 </li>
                 <li>
-                    If [=composition start=] is 0 and [=composition end=] is 0
+                    If |editContext|'s [=composition start=] is 0 and [=composition end=] is 0
                     <ol>
-                        <li>Set [=composition start=] to |selectionStart|</li>
-                        <li>Set [=composition end=] to |selectionEnd|</li>
+                        <li>Set |editContext|'s [=composition start=] to |selectionStart|.</li>
+                        <li>Set |editContext|'s [=composition end=] to |selectionEnd|.</li>
                     </ol>
                 </li>
                 <li>
-                    Replace the substring of [=text=] in the range of [=composition start=] and [=composition end=] with |text|
+                    Replace the substring of |editContext|'s [=text=] in the range of |editContext|'s [=composition start=] and [=composition end=] with |text|
                 </li>
-                <li>Set [=selection start=] to |selectionStart|</li>
-                <li>Set [=selection end=] to |selectionEnd|</li>
-                <li>[=Dispatch text update event=] with |text|</li>
-                <li>Set [=composition end=] to [=composition start=] plus the length of |text|</li>
-                <li>[=Dispatch text format update event=] with |textFormats|</li>
-                <li>[=Dispatch character bounds update event=]</li>
+                <li>Set |editContext|'s [=selection start=] to |selectionStart|.</li>
+                <li>Set |editContext|'s [=selection end=] to |selectionEnd|.</li>
+                <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
+                <li>Set |editContext|'s [=composition end=] to |editContext|'s [=composition start=] plus the length of |text|.</li>
+                <li>[=Dispatch text format update event=] given |editContext| and |textFormats|.</li>
+                <li>[=Dispatch character bounds update event=] given |editContext|.</li>
             </ol>
             </div><!-- algorithm -->
 
@@ -719,7 +723,7 @@
     <ol>
         <li>Let |traversable| be |document|'s [=node navigable=]'s [=top-level traversable=].</li>
         <li>If |traversable| is null, abort these steps.</li>
-        <li>Let |oldActiveEditContext| be the |document|'s [=active EditContext=].</li>
+        <li>Let |oldActiveEditContext| be |document|'s [=active EditContext=].</li>
         <li>Let |newActiveEditContext| be the result of running the steps to [=determine the active EditContext=] given |traversible|.</li>
         <li>If |oldActiveEditContext| is not null, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
         <li>If |newActiveEditContext| is not null, then:
@@ -740,18 +744,19 @@
         <div class="algorithm">
             <dl>
                 <dt>Input</dt>
+                <dd>|editContext|, an {{EditContext}}</dd>
                 <dd>|text|, a string</dd>
                 <dt>Output</dt>
                 <dd>None</dd>
             </dl>
     <ol>
         <li>
-            [=Fire an event=] named "textupdate" at the [=active EditContext=] using {{TextUpdateEvent}}, with
+            [=Fire an event=] named "textupdate" at |editContext| using {{TextUpdateEvent}}, with
             {{TextUpdateEvent/text}} initialized to |text|,
-            {{TextUpdateEvent/compositionStart}} initialized to [=composition start=],
-            {{TextUpdateEvent/compositionEnd}} initialized to [=composition end=],
-            {{TextUpdateEvent/selectionStart}} initialized to [=selection start=], and
-            {{TextUpdateEvent/selectionEnd}} initialized to [=selection end=].
+            {{TextUpdateEvent/compositionStart}} initialized to |editContext|'s [=composition start=],
+            {{TextUpdateEvent/compositionEnd}} initialized to |editContext|'s [=composition end=],
+            {{TextUpdateEvent/selectionStart}} initialized to ||editContext|'s [=selection start=], and
+            {{TextUpdateEvent/selectionEnd}} initialized to |editContext|'s [=selection end=].
         </li>
     </ol>
     </div><!-- algorithm -->
@@ -760,6 +765,7 @@
     <div class="algorithm">
         <dl>
             <dt>Input</dt>
+            <dd>|editContext|, an {{EditContext}}</dd>
             <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
             <dt>Output</dt>
             <dd>None</dd>
@@ -783,7 +789,7 @@
         </ol>
     </li>
     <li>
-        [=Fire an event=] named "textformatupdate" at the [=active EditContext=] using {{TextFormatUpdateEvent}} with
+        [=Fire an event=] named "textformatupdate" at |editContext| using {{TextFormatUpdateEvent}} with
         the {{TextFormatUpdateEvent}}'s [=text format list=] initialized to |formats|.
     </li>
 </ol>
@@ -793,15 +799,15 @@
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>None</dd>
+        <dd>|editContext|, an {{EditContext}}</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
 <ol>
 <li>
-    [=Fire an event=] named "characterboundsupdate" at the [=active EditContext=] using {{CharacterBoundsUpdateEvent}} with
-    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to [=composition start=] and
-    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to [=composition end=].
+    [=Fire an event=] named "characterboundsupdate" at |editContext| using {{CharacterBoundsUpdateEvent}} with
+    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to |editContext|'s [=composition start=] and
+    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to |editContext|'s [=composition end=].
 </li>
 </ol>
 </div><!-- algorithm -->
