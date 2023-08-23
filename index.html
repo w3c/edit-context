@@ -124,11 +124,8 @@
             <ul>
                 <li><dfn>rangeStart</dfn> which is an offset into [=text=] that respresents the position before the first codepoint that should be decorated.</li>
                 <li><dfn>rangeEnd</dfn> which is an offset into [=text=] that respresents the position after the last codepoint that should be decorated.</li>
-                <li><dfn>textColor</dfn> which is the prefered color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
-                <li><dfn>backgroundColor</dfn> which is the prefered background color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
                 <li><dfn>underlineStyle</dfn> which is the prefered underline style of the decorated [=text=] range. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
                 <li><dfn>underlineThickness</dfn> which is the prefered underline thickness of the decorated [=text=] range. The value is one of the following strings: "none", "thin", and "thick"</li>
-                <li><dfn>underlineColor</dfn> which is the prefered underline color of the decorated [=text=] range. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
             </ul>
             <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at an offset within [=text=] indicated by [=start index=].  The struct contains:</p>
             <ul>
@@ -783,12 +780,9 @@
         <ol>
             <li>Set |rangeStart| be the start index of the range where the format will be applied to.</li>
             <li>Set |rangeEnd| be the end index of the range</li>
-            <li>Set |textColor| be the color of the text. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
-            <li>Set |backgroundColor| be the color of the background. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
             <li>Set |underlineStyle| be the underline style. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
             <li>Set |underlineThickness| be the underline thickness. The value is one of the following strings: "none", "thin", and "thick"</li>
-            <li>Set |underlineColor| be the underline color. The value is a <a href="https://www.w3.org/TR/css-color-4/#serializing-sRGB-values">serialized sRGB values</a>.</li>
-            <li>Let |textFormat| be a {{TextFormat}} with |rangeStart|, |rangeEnd|, |textColor|, |backgroundColor|, |underlineStyle|, |underlineThickness|, and |underlineColor|.</li>
+            <li>Let |textFormat| be a {{TextFormat}} with |rangeStart|, |rangeEnd|, |underlineStyle|, |underlineThickness|.</li>
             <li>Add |textFormat| to |formats|</li>
         </ol>
     </li>
@@ -1161,11 +1155,8 @@ interface TextUpdateEvent : Event {
             <pre class="idl"><xmp>dictionary TextFormatInit {
     unsigned long rangeStart;
     unsigned long rangeEnd;
-    DOMString textColor;
-    DOMString backgroundColor;
     DOMString underlineStyle;
     DOMString underlineThickness;
-    DOMString underlineColor;
 };
 
 [Exposed=Window]
@@ -1173,11 +1164,8 @@ interface TextFormat {
     constructor(optional TextFormatInit options = {});
     readonly attribute unsigned long rangeStart;
     readonly attribute unsigned long rangeEnd;
-    readonly attribute DOMString textColor;
-    readonly attribute DOMString backgroundColor;
     readonly attribute DOMString underlineStyle;
     readonly attribute DOMString underlineThickness;
-    readonly attribute DOMString underlineColor;
 };
 
 dictionary TextFormatUpdateEventInit : EventInit {
@@ -1194,16 +1182,10 @@ interface TextFormatUpdateEvent : Event {
                 <dd>The {{TextFormat/rangeStart}} getter steps are to return [=this=]'s [=rangeStart=].</dd>
                 <dt>rangeEnd</dt>
                 <dd>The {{TextFormat/rangeEnd}} getter steps are to return [=this=]'s [=rangeEnd=].</dd>
-                <dt>textColor</dt>
-                <dd>The {{TextFormat/textColor}} getter steps are to return [=this=]'s [=textColor=].</dd>
-                <dt>backgroundColor</dt>
-                <dd>The {{TextFormat/backgroundColor}} getter steps are to return [=this=]'s [=backgroundColor=].</dd>
                 <dt>underlineStyle</dt>
                 <dd>The {{TextFormat/underlineStyle}} getter steps are to return [=this=]'s [=underlineStyle=].</dd>
                 <dt>underlineThickness</dt>
                 <dd>The {{TextFormat/underlineThickness}} getter steps are to return [=this=]'s [=underlineThickness=].</dd>
-                <dt>underlineColor</dt>
-                <dd>The {{TextFormat/underlineColor}} getter steps are to return [=this=]'s [=underlineColor=].</dd>
                 <dt>{{TextFormatUpdateEvent/getTextFormats}} method
                 </dt>
                 <dd>Returns [=this=]'s [=text format list=].</dd>
