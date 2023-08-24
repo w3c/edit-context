@@ -264,8 +264,9 @@
             <p>
                 A new step will be introduced as a substep within the [=Update the rendering=] step
                 in the HTML Event Loops Processing Model, immediately following step 15 (which runs
-                the focusing steps for {{Document}}s whose focused areas become non-focusable).
-                The step is: For each
+                the focusing steps for {{Document}}s whose
+                <a href="https://html.spec.whatwg.org/#focused-area-of-the-document">focused area</a>s
+                become non-focusable). The step is: For each
                 <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active">fully active</a>
                 {{Document}} |doc|, [=queue a global task=] on the [=DOM manipulation task source=]
                 given |doc|'s [=relevant global object=] to run
@@ -721,10 +722,8 @@
         <dd>None</dd>
     </dl>
     <ol>
-        <li>Let |traversable| be |document|'s [=node navigable=]'s [=top-level traversable=].</li>
-        <li>If |traversable| is null, abort these steps.</li>
         <li>Let |oldActiveEditContext| be |document|'s [=active EditContext=].</li>
-        <li>Let |newActiveEditContext| be the result of running the steps to [=determine the active EditContext=] given |traversible|.</li>
+        <li>Let |newActiveEditContext| be the result of running the steps to [=determine the active EditContext=] given |document|.</li>
         <li>If |oldActiveEditContext| is not null, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
         <li>If |newActiveEditContext| is not null, then:
             <ol>
@@ -846,15 +845,14 @@
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>|traversable|, a [=top-level traversable=]</dd>
+        <dd>|document|, a {{Document}}</dd>
         <dt>Output</dt>
         <dd>An {{EditContext}}, or null.</dd>
     </dl>
     <ol>
         <li>
             Let |focused| be the <a href="https://html.spec.whatwg.org/multipage/interaction.html#dom-anchor">DOM anchor</a>
-            of the <a href="https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-traversable">currently focused area of a top-level traversable</a>
-            given |traversable|.
+            of |document|'s <a href="https://html.spec.whatwg.org/#focused-area-of-the-document">focused area</a>.
         </li>
         <li>Let |editContext| be null.</li>
         <li>While |focused| is not null and |focused| is <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>:
