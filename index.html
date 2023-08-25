@@ -96,14 +96,6 @@
                 When changes are made to the [=Text Edit Context=] by the [=Text Input Service=], those changes are reflected to the author asynchronously in the form of events which are dispatched against the [=active EditContext=].
                 When the author makes changes to the [=active EditContext=], those changes will be reflected in the [=Text Edit Context=] during the next lifecycle update.
             </p>
-            <p>
-                To reflect changes made by the author to the [=active EditContext=] since the last lifecycle update, run the steps to [=update the Text Edit Context=] 
-                with the [=active EditContext=]'s [=text state=]'s [=text=], [=selection start=], [=selection end=], [=control bounds=], [=selection bounds=], and [=codepoint locations=].
-            </p>
-            <p>
-                When the [=Text Input Service=] updates the state of the [=Text Edit Context=], run the steps to [=update the EditContext=] 
-                with the [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=], [=selection start=], [=selection end=], [=is composing=], [=composition start=], and [=composition end=].
-            </p>
             <h4>EditContext state</h4>
             <p>
                 Both the [=Text Edit Context=] and {{EditContext}} have a [=text state=] which holds the information exchanged in the aforementioned updates. The <dfn>text state</dfn> consists of:
@@ -138,11 +130,6 @@
                 It would be good if the API could be simplified to require just the positions of the actively composed text along with the [=selection bounds=] and [=control bounds=].
                 Exploration is needed to see if that is possible.
             </p>
-            <p>In addition to [=text state=], an {{EditContext}} also has:
-            <ul>
-                <li><dfn>dirty flag</dfn> which is initially false, but set true by any steps which allow the author to update the state of the {{EditContext}}.</li>
-                <li><dfn>character bounds updated flag</dfn> which is initially false.</li>
-            </ul>
             <h4>Association and activation</h4>
             <p>
                 An {{EditContext}} has an <dfn data-for="edit-context">associated element</dfn>, an {{HTMLElement}}.
@@ -182,18 +169,16 @@
                 </p>
             </div>
             <p>
-                A [=top-level traversable=] should have at most one <dfn>active EditContext</dfn>, which is determined
-                by running the steps to [=determine the active EditContext=] for that [=top-level traversable=].
+                A {{Document}} has an <dfn>active EditContext</dfn>, which may be null.
             </p>
             <p>
-                When an {{EditContext}} that was previously the [=active EditContext=] stops being
-                the [=active EditContext=], run the steps to [=deactivate an EditContext=]
-                on that {{EditContext}}.
+                When a {{Document}} receives text input from the [=Text Input Service=] and that
+                {{Document}} has a non-null [=active EditContext=] |editContext|, the user agent
+                must run [=Update the EditContext=] given |editContext| and the
+                [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=],
+                [=selection start=], [=selection end=], [=is composing=], [=composition start=],
+                and [=composition end=].
             </p>
-            <p class="issue">
-                When, exactly? Do we need a step for this in the Event Loop?
-            </p>
-            <p>When there is an [=active EditContext=] and there is a text input from the [=Text Input Service=], the user agent must run [=Update the EditContext=].</p>
             <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
             <p>
                 <p>
@@ -218,12 +203,12 @@
                 </p>
                 <ul>
                     <li>
-                        When there is an [=active EditContext=], the user agent must not update the DOM
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not update the DOM
                         as a direct result of a user action in the <a>EditContext editing host</a>
                         (e.g., keyboard input in an editable region, deleting or formatting text, ...).
                     </li>
                     <li>
-                        When there is an [=active EditContext=], the user agent must not fire the
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not fire the
                         <a href="https://www.w3.org/TR/uievents/#event-type-input">input</a> event
                         against the <a>EditContext editing host</a> as a direct result of user action
                         event as specified in [[uievents]].
@@ -272,6 +257,18 @@
                     </p>
                 </li>
             </ul>
+            <h4>Event loop changes</h4>
+            <p>
+                A new step will be introduced as a substep within the [=Update the rendering=] step
+                in the HTML Event Loops Processing Model, immediately following step 15 (which runs
+                the focusing steps for {{Document}}s whose
+                <a href="https://html.spec.whatwg.org/#focused-area-of-the-document">focused area</a>s
+                become non-focusable). The step is: For each
+                <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active">fully active</a>
+                {{Document}} |doc|, [=queue a global task=] on the [=DOM manipulation task source=]
+                given |doc|'s [=relevant global object=] to run
+                the [=Update the Text Edit Context=] steps given |doc|.
+            </p>
             <section id="examples" class="informative">
                 <h4>Examples</h4>
                 <p>Using an {{EditContext}}, an author can mark a region of the document editable by <a data-lt="associated element">associating</a> an {{EditContext}} object with an element as shown in the example below: </p>
@@ -653,7 +650,8 @@
                                 </ol>
                             </li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
-                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=active EditContext=], then:
+                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=this=]'s
+                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s [=active EditContext=], then:
                                 <ol>
                                     <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
                                     <li>If |editContext| is not null, run the steps to [=activate an EditContext=] with |editContext|.</li>
@@ -667,6 +665,7 @@
                 <div class="algorithm">
                     <dl>
                         <dt>Input</dt>
+                        <dd>|editContext|, an {{EditContext}}</dd>
                         <dd>|text|, a string</dd>
                         <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
                         <dd>|selectionStart|, the new position for the start of the selection</dd>
@@ -678,64 +677,58 @@
                         <dd>None</dd>
                     </dl>
             <ol>
-                <li>If the [=active EditContext=] != cached active EditContext
-                    <ol>
-                        <li>Return</li>
-                    </ol>
-                </li>
                 <li>
-                    If |text| is not empty and [=is composing=] is false
+                    If |text| is not empty and |editContext|'s [=is composing=] is false.
                     <ol>
-                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at the [=active EditContext=] using {{CompositionEvent}}.
+                        <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at |editContext| using {{CompositionEvent}}.
                         </li>
-                        <li>set [=is composing=] to true</li>
+                        <li>set |editContext|'s [=is composing=] to true.</li>
                     </ol>
                 </li>
                 <li>
-                    If |text| is empty and [=is composing=] is false
+                    If |text| is empty and |editContext|'s [=is composing=] is false
                     <ol>
-                        <li>Return</li>
+                        <li>Return.</li>
                     </ol>
                 </li>
                 <li>
-                    If [=composition start=] is 0 and [=composition end=] is 0
+                    If |editContext|'s [=composition start=] is 0 and [=composition end=] is 0
                     <ol>
-                        <li>Set [=composition start=] to |selectionStart|</li>
-                        <li>Set [=composition end=] to |selectionEnd|</li>
+                        <li>Set |editContext|'s [=composition start=] to |selectionStart|.</li>
+                        <li>Set |editContext|'s [=composition end=] to |selectionEnd|.</li>
                     </ol>
                 </li>
                 <li>
-                    Replace the substring of [=text=] in the range of [=composition start=] and [=composition end=] with |text|
+                    Replace the substring of |editContext|'s [=text=] in the range of |editContext|'s [=composition start=] and [=composition end=] with |text|
                 </li>
-                <li>Set [=selection start=] to |selectionStart|</li>
-                <li>Set [=selection end=] to |selectionEnd|</li>
-                <li>[=Dispatch text update event=] with |text|</li>
-                <li>Set [=composition end=] to [=composition start=] plus the length of |text|</li>
-                <li>[=Dispatch text format update event=] with |textFormats|</li>
-                <li>[=Dispatch character bounds update event=]</li>
+                <li>Set |editContext|'s [=selection start=] to |selectionStart|.</li>
+                <li>Set |editContext|'s [=selection end=] to |selectionEnd|.</li>
+                <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
+                <li>Set |editContext|'s [=composition end=] to |editContext|'s [=composition start=] plus the length of |text|.</li>
+                <li>[=Dispatch text format update event=] given |editContext| and |textFormats|.</li>
+                <li>[=Dispatch character bounds update event=] given |editContext|.</li>
             </ol>
             </div><!-- algorithm -->
 
 <h4><dfn>Update the Text Edit Context</dfn></h4>
 <div class="algorithm">
-    <p>
-        This processing step must occur as a substep within the [=Update the rendering=] step in the HTML Event Loops Processing Model.
-        The step is: Run the [=Update the Text Edit Context=] steps.
-        It must occur just after substep 13: run the animation frame callbacks steps.
-    </p>
     <dl>
         <dt>Input</dt>
-        <dd>None</dd>
+        <dd>|document|, a {{Document}}</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
     <ol>
-        <li>Let |editContext| be the currently [=active EditContext=].</li>
-        <li>If |editContext| is null, abort these steps.</li>
-        <li>If |editContext|'s [=dirty flag=] is false, abort these steps.</li>
-        <li>If |editContext|'s [=character bounds updated flag=] is false, run the steps to [=Dispatch character bounds update event=].</li>
-        <li>If the [=active EditContext=] is no longer |editContext|, abort these steps.</li>
-        <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |editContext|'s [=text state=].</li>
+        <li>Let |oldActiveEditContext| be |document|'s [=active EditContext=].</li>
+        <li>Let |newActiveEditContext| be the result of running the steps to [=determine the active EditContext=] given |document|.</li>
+        <li>If |oldActiveEditContext| is not null, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
+        <li>If |newActiveEditContext| is not null, then:
+            <ol>
+                <li>Run the steps to [=activate an EditContext=] given |newActiveEditContext|.</li>
+                <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |editContext|'s [=text state=].</li>
+            </ol>
+        </li>
+        <li>Set the |document|'s [=active EditContext=] to |newActiveEditContext|.</li>
     </ol>
     <p class="note">
         Note that the steps to update the [=Text Edit Context=]'s [=text state=] are dependent on the nature of the abstraction created over a platform-specific [=Text Input Service=].
@@ -747,18 +740,19 @@
         <div class="algorithm">
             <dl>
                 <dt>Input</dt>
+                <dd>|editContext|, an {{EditContext}}</dd>
                 <dd>|text|, a string</dd>
                 <dt>Output</dt>
                 <dd>None</dd>
             </dl>
     <ol>
         <li>
-            [=Fire an event=] named "textupdate" at the [=active EditContext=] using {{TextUpdateEvent}}, with
+            [=Fire an event=] named "textupdate" at |editContext| using {{TextUpdateEvent}}, with
             {{TextUpdateEvent/text}} initialized to |text|,
-            {{TextUpdateEvent/compositionStart}} initialized to [=composition start=],
-            {{TextUpdateEvent/compositionEnd}} initialized to [=composition end=],
-            {{TextUpdateEvent/selectionStart}} initialized to [=selection start=], and
-            {{TextUpdateEvent/selectionEnd}} initialized to [=selection end=].
+            {{TextUpdateEvent/compositionStart}} initialized to |editContext|'s [=composition start=],
+            {{TextUpdateEvent/compositionEnd}} initialized to |editContext|'s [=composition end=],
+            {{TextUpdateEvent/selectionStart}} initialized to ||editContext|'s [=selection start=], and
+            {{TextUpdateEvent/selectionEnd}} initialized to |editContext|'s [=selection end=].
         </li>
     </ol>
     </div><!-- algorithm -->
@@ -767,6 +761,7 @@
     <div class="algorithm">
         <dl>
             <dt>Input</dt>
+            <dd>|editContext|, an {{EditContext}}</dd>
             <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
             <dt>Output</dt>
             <dd>None</dd>
@@ -787,7 +782,7 @@
         </ol>
     </li>
     <li>
-        [=Fire an event=] named "textformatupdate" at the [=active EditContext=] using {{TextFormatUpdateEvent}} with
+        [=Fire an event=] named "textformatupdate" at |editContext| using {{TextFormatUpdateEvent}} with
         the {{TextFormatUpdateEvent}}'s [=text format list=] initialized to |formats|.
     </li>
 </ol>
@@ -797,15 +792,15 @@
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>None</dd>
+        <dd>|editContext|, an {{EditContext}}</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
 <ol>
 <li>
-    [=Fire an event=] named "characterboundsupdate" at the [=active EditContext=] using {{CharacterBoundsUpdateEvent}} with
-    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to [=composition start=] and
-    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to [=composition end=].
+    [=Fire an event=] named "characterboundsupdate" at |editContext| using {{CharacterBoundsUpdateEvent}} with
+    {{CharacterBoundsUpdateEvent/rangeStart}} initialized to |editContext|'s [=composition start=] and
+    {{CharacterBoundsUpdateEvent/rangeEnd}} initialized to |editContext|'s [=composition end=].
 </li>
 </ol>
 </div><!-- algorithm -->
@@ -844,15 +839,26 @@
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>|traversable|, a [=top-level traversable=]</dd>
+        <dd>|document|, a {{Document}}</dd>
         <dt>Output</dt>
         <dd>An {{EditContext}}, or null.</dd>
     </dl>
     <ol>
+        <li>Let |traversable| be |document|'s [=node navigable=]'s [=top-level traversable=].</li>
+        <li>If |traversable| is null, return null.</li>
         <li>
             Let |focused| be the <a href="https://html.spec.whatwg.org/multipage/interaction.html#dom-anchor">DOM anchor</a>
             of the <a href="https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-traversable">currently focused area of a top-level traversable</a>
             given |traversable|.
+        </li>
+        <li>
+            <p>If |focused| is null or if the [=shadow-including root=] of |focused| is not |document|, return null.</p>
+            <p class="note">
+                The purpose of getting |focusable| through the [=top-level traversable=] is that
+                we want there to be only one [=active EditContext=] at a time per
+                [=top-level traversable=]. So if system focus is in some other document, this
+                document can't have an [=active EditContext=].
+            </p>
         </li>
         <li>Let |editContext| be null.</li>
         <li>While |focused| is not null and |focused| is <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>:
