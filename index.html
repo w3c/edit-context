@@ -850,9 +850,21 @@
         <dd>An {{EditContext}}, or null.</dd>
     </dl>
     <ol>
+        <li>Let |traversable| be |document|'s [=node navigable=]'s [=top-level traversable=].</li>
+        <li>If |traversable| is null, return null.</li>
         <li>
             Let |focused| be the <a href="https://html.spec.whatwg.org/multipage/interaction.html#dom-anchor">DOM anchor</a>
-            of |document|'s <a href="https://html.spec.whatwg.org/#focused-area-of-the-document">focused area</a>.
+            of the <a href="https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-traversable">currently focused area of a top-level traversable</a>
+            given |traversable|.
+        </li>
+        <li>
+            <p>If |focused| is null or if the [=shadow-including root=] of |focused| is not |document|, return null.</p>
+            <p class="note">
+                The purpose of getting |focusable| through the [=top-level traversable=] is that
+                we want there to be only one [=active EditContext=] at a time per
+                [=top-level traversable=]. So if system focus is in some other document, this
+                document can't have an [=active EditContext=].
+            </p>
         </li>
         <li>Let |editContext| be null.</li>
         <li>While |focused| is not null and |focused| is <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>:
