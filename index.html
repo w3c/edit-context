@@ -669,15 +669,15 @@
                         <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
                         <dd>|selectionStart|, the new position for the start of the selection</dd>
                         <dd>|selectionEnd|, the new position for the end of the selection</dd>
-                        <dd>|isComposing|, </dd>
-                        <dd>|replacementRangeStart|, </dd>
-                        <dd>|replacementRangeEnd|, </dd>
+                        <dd>|isComposing|, a boolean indicating whether composition should be active at the end of the update</dd>
+                        <dd>|replacementRangeStart|, the start position of the current composition (0 if there is no composition)</dd>
+                        <dd>|replacementRangeEnd|, the end position of the current composition (0 if there is no composition)</dd>
                         <dt>Output</dt>
                         <dd>None</dd>
                     </dl>
             <ol>
                 <li>
-                    If |text| is not empty and |editContext|'s [=is composing=] is false.
+                    If |isComposing| is true, |text| is not empty, and |editContext|'s [=is composing=] is false.
                     <ol>
                         <li>[=Fire an event=] named <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionstart</a> at |editContext| using {{CompositionEvent}}.
                         </li>
@@ -685,27 +685,56 @@
                     </ol>
                 </li>
                 <li>
-                    If |text| is empty and |editContext|'s [=is composing=] is false
+                    If |text| is empty:
                     <ol>
-                        <li>Return.</li>
+                        <li>If |editContext|'s [=is composing=] is false, return.</li>
+                        <li>
+                            If |editContext|'s [=is composing=] is true and |isComposing| is false, then:
+                            <ol>
+                                <li>Set |editContext|'s [=is composing=] to false.</li>
+                                <li>
+                                    [=Fire an event=] named
+                                    <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionend</a>
+                                    at |editContext| using {{CompositionEvent}}.
+                                </li>
+                                <li>Return.</li>
+                            </ol>
+                        </li>
                     </ol>
                 </li>
-                <li>
-                    If |editContext|'s [=composition start=] is 0 and [=composition end=] is 0
-                    <ol>
-                        <li>Set |editContext|'s [=composition start=] to |selectionStart|.</li>
-                        <li>Set |editContext|'s [=composition end=] to |selectionEnd|.</li>
-                    </ol>
+                <li>If |editContext|'s [=is composing=] is true, then:
+                    <ol>Let |insertionStart| be |replacementRangeStart|.</ol>
+                    <ol>Let |insertionEnd| be |replacementRangeEnd|.</ol>
+                </li>
+                <li>Otherwise:
+                    <ol>Let |insertionStart| be |selectionStart|.</ol>
+                    <ol>Let |insertionEnd| be |selectionEnd|.</ol>
                 </li>
                 <li>
-                    Replace the substring of |editContext|'s [=text=] in the range of |editContext|'s [=composition start=] and [=composition end=] with |text|
+                    Replace the substring of |editContext|'s [=text=] in the range of |insertionStart| and |insertionEnd| with |text|
                 </li>
                 <li>Set |editContext|'s [=selection start=] to |selectionStart|.</li>
                 <li>Set |editContext|'s [=selection end=] to |selectionEnd|.</li>
-                <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
+                <li>Set |editContext|'s [=composition start=] to |insertionStart|.</li>
                 <li>Set |editContext|'s [=composition end=] to |editContext|'s [=composition start=] plus the length of |text|.</li>
-                <li>[=Dispatch text format update event=] given |editContext| and |textFormats|.</li>
-                <li>[=Dispatch character bounds update event=] given |editContext|.</li>
+                <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
+                <li>
+                    If |editContext|'s [=is composing=] is true, then:
+                    <ol>
+                        <li>[=Dispatch text format update event=] given |editContext| and |textFormats|.</li>
+                        <li>[=Dispatch character bounds update event=] given |editContext|.</li>
+                        <li>If |isComposing| is false, then:
+                            <ol>
+                                <li>Set |editContext|'s [=is composing=] to false.</li>
+                                <li>
+                                    [=Fire an event=] named
+                                    <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionend</a>
+                                    at |editContext| using {{CompositionEvent}}.
+                                </li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
             </ol>
             </div><!-- algorithm -->
 
