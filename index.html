@@ -650,12 +650,11 @@
                                 </ol>
                             </li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
-                            <li>If |oldEditContext| is not null and |oldEditContext| is the [=this=]'s
-                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s [=active EditContext=], then:
-                                <ol>
-                                    <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
-                                    <li>If |editContext| is not null, run the steps to [=activate an EditContext=] with |editContext|.</li>
-                                </ol>
+                            <li>
+                                If |oldEditContext| is not null and |oldEditContext| is [=this=]'s
+                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s
+                                [=active EditContext=], then run the steps to [=deactivate an EditContext=]
+                                with |oldEditContext|.
                             </li>
                         </ol>
                     </div><!-- algorithm -->
@@ -724,7 +723,6 @@
         <li>If |oldActiveEditContext| is not null, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
         <li>If |newActiveEditContext| is not null, then:
             <ol>
-                <li>Run the steps to [=activate an EditContext=] given |newActiveEditContext|.</li>
                 <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |editContext|'s [=text state=].</li>
             </ol>
         </li>
@@ -805,32 +803,20 @@
 </ol>
 </div><!-- algorithm -->
 
-<h4><dfn>Activate an EditContext</dfn></h4>
-<div class="algorithm">
-    <dl>
-        <dt>Input</dt>
-        <dd>|this| an {{EditContext}}</dd>
-        <dt>Output</dt>
-        <dd>None</dd>
-    </dl>
-    <ol>
-        <li>
-            <div class="note">Add details</div>
-        </li>
-    </ol>
-</div><!-- algorithm -->
-
 <h4><dfn>Deactivate an EditContext</dfn></h4>
 <div class="algorithm">
     <dl>
         <dt>Input</dt>
-        <dd>|this| an {{EditContext}}</dd>
+        <dd>|editContext|, an {{EditContext}}</dd>
         <dt>Output</dt>
         <dd>None</dd>
     </dl>
     <ol>
+        <li>Set |editContext|'s [=is composing=] to false.</li>
         <li>
-            <div class="note">Add details</div>
+            [=Fire an event=] named
+            <a href="https://w3c.github.io/uievents/#event-type-compositionstart">compositionend</a>
+            at |editContext| using {{CompositionEvent}}.
         </li>
     </ol>
 </div><!-- algorithm -->
