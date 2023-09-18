@@ -114,10 +114,10 @@
             </ul>
             <p><dfn>text format</dfn> is a struct that indicates decorative properties that should be applied to the ranges of [=text=].  The struct contains:</p>
             <ul>
-                <li><dfn>rangeStart</dfn> which is an offset into [=text=] that respresents the position before the first codepoint that should be decorated.</li>
-                <li><dfn>rangeEnd</dfn> which is an offset into [=text=] that respresents the position after the last codepoint that should be decorated.</li>
-                <li><dfn>underlineStyle</dfn> which is the prefered underline style of the decorated [=text=] range. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
-                <li><dfn>underlineThickness</dfn> which is the prefered underline thickness of the decorated [=text=] range. The value is one of the following strings: "none", "thin", and "thick"</li>
+                <li><dfn>range start</dfn> which is an offset into [=text=] that respresents the position before the first codepoint that should be decorated.</li>
+                <li><dfn>range end</dfn> which is an offset into [=text=] that respresents the position after the last codepoint that should be decorated.</li>
+                <li><dfn>underline style</dfn>, a {{UnderlineStyle}} which is the preferred underline style of the decorated [=text=] range.</li>
+                <li><dfn>underline thickness</dfn>, a {{UnderlineThickness}} which is the preferred underline thickness of the decorated [=text=] range.</li>
             </ul>
             <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at an offset within [=text=] indicated by [=start index=].  The struct contains:</p>
             <ul>
@@ -666,7 +666,7 @@
                         <dt>Input</dt>
                         <dd>|editContext|, an {{EditContext}}</dd>
                         <dd>|text|, a string</dd>
-                        <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
+                        <dd>|textFormats|, an array of [=text format=]s from the [=Text Input Service=]</dd>
                         <dd>|selectionStart|, the new position for the start of the selection</dd>
                         <dd>|selectionEnd|, the new position for the end of the selection</dd>
                         <dd>|isComposing|, </dd>
@@ -760,7 +760,7 @@
         <dl>
             <dt>Input</dt>
             <dd>|editContext|, an {{EditContext}}</dd>
-            <dd>|textFormats|, a structure that has an array of text format info from the [=Text Input Service=]</dd>
+            <dd>|textFormats|, an array of [=text format=]s from the [=Text Input Service=]</dd>
             <dt>Output</dt>
             <dd>None</dd>
         </dl>
@@ -769,14 +769,14 @@
         Let |formats| be an array of {{TextFormat}}, initially empty.
     </li>
     <li>
-        For each text format in |textFormats|,
+        For each [=text format=] |format| in |textFormats|,
         <ol>
-            <li>Set |rangeStart| be the start index of the range where the format will be applied to.</li>
-            <li>Set |rangeEnd| be the end index of the range</li>
-            <li>Set |underlineStyle| be the underline style. The value is one of the following strings: "none", "solid", "double", "dotted", "dashed", and "wavy". </li>
-            <li>Set |underlineThickness| be the underline thickness. The value is one of the following strings: "none", "thin", and "thick"</li>
-            <li>Let |textFormat| be a {{TextFormat}} with |rangeStart|, |rangeEnd|, |underlineStyle|, |underlineThickness|.</li>
-            <li>Add |textFormat| to |formats|</li>
+            <li>Let |textFormat| be a new {{TextFormat}}. with |rangeStart|, |rangeEnd|, |underlineStyle|, |underlineThickness|.</li>
+            <li>Set |textFormat|'s {{TextFormat/rangeStart}} to |format|'s [=range start=].</li>
+            <li>Set |textFormat|'s {{TextFormat/rangeEnd}} to |format|'s [=range end=].</li>
+            <li>Set |textFormat|'s {{TextFormat/underlineStyle}} to |format|'s [=underline style=].</li>
+            <li>Set |textFormat|'s {{TextFormat/underlineThickness}} to |format|'s [=underline thickness=].</li>
+            <li>Append |textFormat| to |formats|</li>
         </ol>
     </li>
     <li>
@@ -1144,11 +1144,14 @@ interface TextUpdateEvent : Event {
         </section>
         <section>
             <h3>TextFormatUpdateEvent</h3>
-            <pre class="idl"><xmp>dictionary TextFormatInit {
+            <pre class="idl"><xmp>enum UnderlineStyle { "none", "solid", "double", "dotted", "dashed", "wavy" };
+enum UnderlineThickness { "none", "thin", "thick" };
+
+dictionary TextFormatInit {
     unsigned long rangeStart;
     unsigned long rangeEnd;
-    DOMString underlineStyle;
-    DOMString underlineThickness;
+    UnderlineStyle underlineStyle;
+    UnderlineThickness underlineThickness;
 };
 
 [Exposed=Window]
@@ -1156,8 +1159,8 @@ interface TextFormat {
     constructor(optional TextFormatInit options = {});
     readonly attribute unsigned long rangeStart;
     readonly attribute unsigned long rangeEnd;
-    readonly attribute DOMString underlineStyle;
-    readonly attribute DOMString underlineThickness;
+    readonly attribute UnderlineStyle underlineStyle;
+    readonly attribute UnderlineThickness underlineThickness;
 };
 
 dictionary TextFormatUpdateEventInit : EventInit {
@@ -1170,14 +1173,14 @@ interface TextFormatUpdateEvent : Event {
     sequence<TextFormat> getTextFormats();
 };</xmp></pre>
             <dl>
-                <dt>rangeStart</dt>
-                <dd>The {{TextFormat/rangeStart}} getter steps are to return [=this=]'s [=rangeStart=].</dd>
-                <dt>rangeEnd</dt>
-                <dd>The {{TextFormat/rangeEnd}} getter steps are to return [=this=]'s [=rangeEnd=].</dd>
-                <dt>underlineStyle</dt>
-                <dd>The {{TextFormat/underlineStyle}} getter steps are to return [=this=]'s [=underlineStyle=].</dd>
-                <dt>underlineThickness</dt>
-                <dd>The {{TextFormat/underlineThickness}} getter steps are to return [=this=]'s [=underlineThickness=].</dd>
+                <dt>{{TextFormat/rangeStart}}, of type unsigned long, readonly</dt>
+                <dd>An offset that respresents the position before the first codepoint that should be decorated.</dd>
+                <dt>{{TextFormat/rangeEnd}}, of type unsigned long, readonly</dt>
+                <dd>An offset that respresents the position after the last codepoint that should be decorated.</dd>
+                <dt>{{TextFormat/underlineStyle}}, of type {{UnderlineStyle}}, readonly</dt>
+                <dd>The preferred underline style of the decorated text range.</dd>
+                <dt>{{TextFormat/underlineThickness}}, of type {{UnderlineThickness}}, readonly</dt>
+                <dd> The preferred underline thickness of the decorated text range.</dd>
                 <dt>{{TextFormatUpdateEvent/getTextFormats}} method
                 </dt>
                 <dd>Returns [=this=]'s [=text format list=].</dd>
