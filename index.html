@@ -716,7 +716,7 @@
                 <li>Set |editContext|'s [=selection start=] to |selectionStart|.</li>
                 <li>Set |editContext|'s [=selection end=] to |selectionEnd|.</li>
                 <li>Set |editContext|'s [=composition start=] to |insertionStart|.</li>
-                <li>Set |editContext|'s [=composition end=] to |editContext|'s [=composition start=] plus the length of |text|.</li>
+                <li>Set |editContext|'s [=composition end=] to |insertionEnd|.</li>
                 <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
                 <li>
                     If |editContext|'s [=is composing=] is true, then:
