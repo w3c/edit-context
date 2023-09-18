@@ -137,6 +137,13 @@
                 the {{EditContext}} to the element's {{HTMLElement/editContext}} property.
                 An {{HTMLElement}} can be <a data-lt="associated element">associated</a> with at most one {{EditContext}}.
             </p>
+            <p class="note">
+              An {{EditContext}} keeps its [=associated element=] alive, so developers
+              should be aware that assigning an {{EditContext}} to an element's
+              {{HTMLElement/editContext}} property will prevent the element from being garbage
+              collected until the property is cleared or the {{EditContext}} is garbage collected.
+            </p>
+            </p>
             <p>
                 If an {{EditContext}}'s <a>associated element</a>'s parent is not
                 <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
@@ -1072,9 +1079,6 @@ interface EditContext : EventTarget {
             <dd><p>The method returns a list with one item which is the the {{EditContext}}'s <a>associated element</a>, or an empty list if the {{EditContext}}'s <a>associated element</a> is null.</p></dd>
             <p class="note">
                 This method returns a list instead of a single element for forward compatibility if {{EditContext}} is ever granted the ability to have multiple <a>associated elements</a>.
-            </p>
-            <p class="issue">
-                Should attachedElements() return elements that are removed from the tree? If yes, the EditContext will keep removed elements alive. If not, we probably shouldn't allow a disconnected element to <a data-lt="associated element">associate</a> with EditContext, otherwise, it would be confusing/unintuitive that we allow it but attachedElements returns empty.
             </p>
             
             <dt>ontextupdate</dt>
