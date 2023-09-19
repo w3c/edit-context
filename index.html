@@ -45,7 +45,8 @@
           , "HTML"
           , "geometry-1"
           , "uievents"
-          , "infra"]
+          , "infra"
+          , "input-events"]
         };
     </script>
 </head>
@@ -147,7 +148,7 @@
             <p>
                 If an {{EditContext}}'s <a>associated element</a>'s parent is not
                 <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
-                then the <a>associated element</a> becomes an <dfn>EditContext editing host</dfn>.
+                then the <a>associated element</a> becomes an <dfn class="export">EditContext editing host</dfn>.
                 An <a>EditContext editing host</a> is a type of [=editing host=] whose behaviors
                 are described in [[[#edit-context-differences]]].
             </p>
@@ -178,13 +179,17 @@
             <p>
                 A {{Document}} has an <dfn>active EditContext</dfn>, which may be null.
             </p>
+            <p class="issue">
+                The following paragraph can be removed once the behavior change lands
+                in [[input-events]].
+            </p>
             <p>
-                When a {{Document}} receives text input from the [=Text Input Service=] and that
-                {{Document}} has a non-null [=active EditContext=] |editContext|, the user agent
-                must run [=Update the EditContext=] given |editContext| and the
-                [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=],
-                [=selection start=], [=selection end=], [=is composing=], [=composition start=],
-                and [=composition end=].
+                When an [=EditContext editing host=] receives text input from the
+                [=Text Input Service=], as the
+                <a href="https://www.w3.org/TR/uievents/#default-action">default action</a> for the
+                <a href="https://www.w3.org/TR/uievents/#event-type-beforeinput">beforeinput</a>
+                event fired as a result of that input the user agent must run
+                [=Handle Input for EditContext=] given the [=EditContext editing host=] .
             </p>
             <h4 id="edit-context-differences">Differences for an EditContext editing host</h4>
             <p>
@@ -667,21 +672,56 @@
                     </div><!-- algorithm -->
                 </dd>
             </dl>
-                <h4><dfn>Update the EditContext</dfn></h4>
-                <div class="algorithm">
-                    <dl>
-                        <dt>Input</dt>
-                        <dd>|editContext|, an {{EditContext}}</dd>
-                        <dd>|text|, a string</dd>
-                        <dd>|textFormats|, an array of [=text format=]s from the [=Text Input Service=]</dd>
-                        <dd>|selectionStart|, the new position for the start of the selection</dd>
-                        <dd>|selectionEnd|, the new position for the end of the selection</dd>
-                        <dd>|isComposing|, a boolean indicating whether composition should be active at the end of the update</dd>
-                        <dd>|replacementRangeStart|, the start position of the current composition (0 if there is no composition)</dd>
-                        <dd>|replacementRangeEnd|, the end position of the current composition (0 if there is no composition)</dd>
-                        <dt>Output</dt>
-                        <dd>None</dd>
-                    </dl>
+            <h4><dfn class="export">Handle input for EditContext</dfn></h4>
+            <div class="algorithm">
+                <dl>
+                    <dt>Input</dt>
+                    <dd>|element|, the {{HTMLElement}} receiving the input</dd>
+                    <dt>Output</dt>
+                    <dd>None</dd>
+                </dl>
+                <ol>
+                    <li>
+                        Let |editContext| be |element|'s
+                        <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s
+                        [=active EditContext=]
+                    </li>
+                    <li>
+                        If |editContext| is null, return.
+                    </li>
+                    <li>
+                        <p>
+                            Run the steps to [=Update the EditContext=] given |editContext| and the
+                            [=Text Edit Context=]'s [=text state=]'s [=text=], [=text formats=],
+                            [=selection start=], [=selection end=], [=is composing=], [=composition start=],
+                            and [=composition end=].
+                        </p>
+                        <p class="note">
+                            Since [=Text Edit Context=] is an an abstraction over the common aspects
+                            of text input across different operating systems, the determination of
+                            the values in the [=Text Edit Context=] is explicitly not given in this
+                            specification. They will vary across different operating systems and
+                            input devices.
+                        </p>
+                    </li>
+                </ol>
+            </div><!-- algorithm -->
+
+            <h4><dfn>Update the EditContext</dfn></h4>
+            <div class="algorithm">
+                <dl>
+                    <dt>Input</dt>
+                    <dd>|editContext|, an {{EditContext}}</dd>
+                    <dd>|text|, a string</dd>
+                    <dd>|textFormats|, an array of [=text format=]s from the [=Text Input Service=]</dd>
+                    <dd>|selectionStart|, the new position for the start of the selection</dd>
+                    <dd>|selectionEnd|, the new position for the end of the selection</dd>
+                    <dd>|isComposing|, a boolean indicating whether composition should be active at the end of the update</dd>
+                    <dd>|replacementRangeStart|, the start position of the current composition (0 if there is no composition)</dd>
+                    <dd>|replacementRangeEnd|, the end position of the current composition (0 if there is no composition)</dd>
+                    <dt>Output</dt>
+                    <dd>None</dd>
+                </dl>
             <ol>
                 <li>
                     If |isComposing| is true, |text| is not empty, and |editContext|'s [=is composing=] is false.
