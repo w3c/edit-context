@@ -300,12 +300,10 @@
     // This example is built on top of example 1.
     // Only the added logic is shown here for brevity.
     class EditingModel {
-        constructor(text, selectionStart, selectionEnd, compositionStart, compositionEnd) {
+        constructor(text, selectionStart, selectionEnd) {
             this.text = text  
             this.selectionStart = selectionStart
             this.selectionEnd = selectionEnd
-            this.compositionStart = compositionStart
-            this.compositionEnd = compositionEnd
         }  
     }  
 
@@ -390,11 +388,6 @@
             this.selectionEnd = selectionEnd
         }
 
-        updateCompositionRange(compositionStart, compositionEnd) {
-            this.compositionStart = compositionStart
-            this.compositionEnd = compositionEnd
-        }
-
         updateTextFormats(textFormats) {
             this.textFormats = textFormats
         }
@@ -432,11 +425,9 @@
 
     class EditingController {
         handleTextUpdate(updateRangeStart, updateRangeEnd, text, 
-                         selectionStart, selectionEnd,
-                         compositionStart, compositionEnd) {
+                         selectionStart, selectionEnd) {
             this.model.updateText(updateRangeStart, updateRangeEnd, text)
             this.model.updateSelection(selectionStart, selectionEnd)
-            this.model.updateCompositionRange(compositionStart, compositionEnd)
         }
 
         handleTextFormatUpdate(textFormats) {
@@ -453,8 +444,7 @@
     // which can be used to update the editor's model.
     editContext.addEventListener("textupdate", e => {
         editingController.handleTextUpdate(e.updateRangeStart, e.updateRangeEnd, e.text,
-                                        e.selectionStart, e.selectionEnd,
-                                        e.compositionStart, e.compositionEnd)
+                                        e.selectionStart, e.selectionEnd)
     });
 
     // EditContext will also receive textformatupdate event for IME decoration.
@@ -823,8 +813,6 @@
         <li>
             [=Fire an event=] named "textupdate" at |editContext| using {{TextUpdateEvent}}, with
             {{TextUpdateEvent/text}} initialized to |text|,
-            {{TextUpdateEvent/compositionStart}} initialized to |editContext|'s [=composition start=],
-            {{TextUpdateEvent/compositionEnd}} initialized to |editContext|'s [=composition end=],
             {{TextUpdateEvent/selectionStart}} initialized to ||editContext|'s [=selection start=], and
             {{TextUpdateEvent/selectionEnd}} initialized to |editContext|'s [=selection end=].
         </li>
@@ -1165,8 +1153,6 @@ interface TextUpdateEvent : Event {
     readonly attribute DOMString text;
     readonly attribute unsigned long selectionStart;
     readonly attribute unsigned long selectionEnd;
-    readonly attribute unsigned long compositionStart;
-    readonly attribute unsigned long compositionEnd;
 };</xmp></pre>
             <dl>
                 <dt>{{TextUpdateEvent/updateRangeStart}}, of type unsigned long, readonly</dt>
@@ -1183,12 +1169,6 @@ interface TextUpdateEvent : Event {
 
                 <dt>{{TextUpdateEvent/selectionEnd}}, of type unsigned long, readonly</dt>
                 <dd>The end position of the selection after the text replacement.</dd>
-
-                <dt>{{TextUpdateEvent/compositionStart}}, of type unsigned long, readonly</dt>
-                <dd>The start position of the composition after the text replacement.</dd>
-
-                <dt>{{TextUpdateEvent/compositionEnd}}, of type unsigned long, readonly</dt>
-                <dd>The end position of the composition after the text replacement.</dd>
             </dl>
         </section>
         <section>
