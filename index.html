@@ -952,7 +952,7 @@ interface EditContext : EventTarget {
     undefined updateSelectionBounds(DOMRect selectionBounds);
     undefined updateCharacterBounds(unsigned long rangeStart, sequence<DOMRect> characterBounds);
 
-    sequence<Element> attachedElements();
+    sequence<HTMLElement> attachedElements();
 
     readonly attribute DOMString text;
     readonly attribute unsigned long selectionStart;
