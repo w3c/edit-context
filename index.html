@@ -300,12 +300,10 @@
     // This example is built on top of example 1.
     // Only the added logic is shown here for brevity.
     class EditingModel {
-        constructor(text, selectionStart, selectionEnd, compositionStart, compositionEnd) {
+        constructor(text, selectionStart, selectionEnd) {
             this.text = text  
             this.selectionStart = selectionStart
             this.selectionEnd = selectionEnd
-            this.compositionStart = compositionStart
-            this.compositionEnd = compositionEnd
         }  
     }  
 
@@ -354,7 +352,7 @@
             // These bounds have x, y, width and height members  
             // so they can be assigned directly to EditContext.
             editContext.updateSelectionBounds(selectionBounds)
-            editContext.updateControlBoundss(controlBounds)
+            editContext.updateControlBounds(controlBounds)
         }
     }
 
@@ -388,11 +386,6 @@
         updateSelection(selectionStart, selectionEnd) {
             this.selectionStart = selectionStart
             this.selectionEnd = selectionEnd
-        }
-
-        updateCompositionRange(compositionStart, compositionEnd) {
-            this.compositionStart = compositionStart
-            this.compositionEnd = compositionEnd
         }
 
         updateTextFormats(textFormats) {
@@ -432,11 +425,9 @@
 
     class EditingController {
         handleTextUpdate(updateRangeStart, updateRangeEnd, text, 
-                         selectionStart, selectionEnd,
-                         compositionStart, compositionEnd) {
+                         selectionStart, selectionEnd) {
             this.model.updateText(updateRangeStart, updateRangeEnd, text)
             this.model.updateSelection(selectionStart, selectionEnd)
-            this.model.updateCompositionRange(compositionStart, compositionEnd)
         }
 
         handleTextFormatUpdate(textFormats) {
@@ -453,8 +444,7 @@
     // which can be used to update the editor's model.
     editContext.addEventListener("textupdate", e => {
         editingController.handleTextUpdate(e.updateRangeStart, e.updateRangeEnd, e.text,
-                                        e.selectionStart, e.selectionEnd,
-                                        e.compositionStart, e.compositionEnd)
+                                        e.selectionStart, e.selectionEnd)
     });
 
     // EditContext will also receive textformatupdate event for IME decoration.
@@ -823,8 +813,6 @@
         <li>
             [=Fire an event=] named "textupdate" at |editContext| using {{TextUpdateEvent}}, with
             {{TextUpdateEvent/text}} initialized to |text|,
-            {{TextUpdateEvent/compositionStart}} initialized to |editContext|'s [=composition start=],
-            {{TextUpdateEvent/compositionEnd}} initialized to |editContext|'s [=composition end=],
             {{TextUpdateEvent/selectionStart}} initialized to ||editContext|'s [=selection start=], and
             {{TextUpdateEvent/selectionEnd}} initialized to |editContext|'s [=selection end=].
         </li>
@@ -969,11 +957,6 @@ interface EditContext : EventTarget {
     readonly attribute DOMString text;
     readonly attribute unsigned long selectionStart;
     readonly attribute unsigned long selectionEnd;
-    readonly attribute unsigned long compositionRangeStart;
-    readonly attribute unsigned long compositionRangeEnd;
-    readonly attribute boolean isComposing;
-    readonly attribute DOMRect controlBounds;
-    readonly attribute DOMRect selectionBounds;
     readonly attribute unsigned long characterBoundsRangeStart;
     sequence<DOMRect> characterBounds();
 
@@ -992,25 +975,6 @@ interface EditContext : EventTarget {
 
             <dt>selectionEnd</dt>
             <dd>The {{EditContext/selectionEnd}} getter steps are to return [=this=]'s [=selection end=].</dd>
-
-            <dt>compositionRangeStart</dt>
-            <dd>The {{EditContext/compositionRangeStart}} getter steps are to return [=this=]'s [=composition start=].</dd>
-
-            <dt>compositionRangeEnd</dt>
-            <dd>The {{EditContext/compositionRangeEnd}} getter steps are to return [=this=]'s [=composition end=].</dd>
-
-            <dt>isComposing</dt>
-            <dd>The {{EditContext/isComposing}} getter steps are to return [=this=]'s [=is composing=].</dd>
-
-            <dt>controlBounds</dt>
-            <dd>The {{EditContext/controlBounds}} getter steps are to return [=this=]'s [=control bounds=].</dd>
-
-<p class="note">
-    The control bound may be used by the OS for hittesting to trigger the virtual keyboard.
-</p>
-
-            <dt>selectionBounds</dt>
-            <dd>The {{EditContext/selectionBounds}} getter steps are to return [=this=]'s [=selection bounds=].</dd>
 
             <dt>characterBounds</dt>
             <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=codepoint rects=].</dd>
@@ -1139,7 +1103,7 @@ interface EditContext : EventTarget {
                             set [=start index=] to |rangeStart|.
                         </li>
                         <li>
-                            set [=codepoint rects=] to |controlBounds|.
+                            set [=codepoint rects=] to |characterBounds|.
                         </li>
                     </ol>
                 </div>
@@ -1189,8 +1153,6 @@ interface TextUpdateEvent : Event {
     readonly attribute DOMString text;
     readonly attribute unsigned long selectionStart;
     readonly attribute unsigned long selectionEnd;
-    readonly attribute unsigned long compositionStart;
-    readonly attribute unsigned long compositionEnd;
 };</xmp></pre>
             <dl>
                 <dt>{{TextUpdateEvent/updateRangeStart}}, of type unsigned long, readonly</dt>
@@ -1207,12 +1169,6 @@ interface TextUpdateEvent : Event {
 
                 <dt>{{TextUpdateEvent/selectionEnd}}, of type unsigned long, readonly</dt>
                 <dd>The end position of the selection after the text replacement.</dd>
-
-                <dt>{{TextUpdateEvent/compositionStart}}, of type unsigned long, readonly</dt>
-                <dd>The start position of the composition after the text replacement.</dd>
-
-                <dt>{{TextUpdateEvent/compositionEnd}}, of type unsigned long, readonly</dt>
-                <dd>The end position of the composition after the text replacement.</dd>
             </dl>
         </section>
         <section>
