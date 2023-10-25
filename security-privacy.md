@@ -6,6 +6,8 @@ Questions from https://www.w3.org/TR/security-privacy-questionnaire/
 
 Just like the existing UI key events, EditContext exposes text that has been typed by the user. This data helps text input services to perform operations such as suggestions, IME compositions, VK shape-writing etc.
 
+This is the same data that is exposed when an origin has a `contenteditable=""` DOM element or another type of editable field.
+
 ## 2.2. Is this specification exposing the minimum amount of information necessary to power the feature?
 
 Yes.
@@ -26,15 +28,17 @@ No.
 
 EditContext does not expose any data related to the underlying platform.
 
-## 2.7. Does this specification allow an origin access to sensors on a user’s device
+## 2.7. Does this specification allow an origin to send data to the underlying platform?
+
+EditContext allows pages to provide coordinates at which text input related UI should be displayed.
+This offers a similar level of control compared to what the author can do by positioning an input element in the page.
+No new data is exposed, only new APIs to communicate the coordinates in a more direct way.
+
+## 2.8. Does this specification allow an origin access to sensors on a user’s device?
 
 No.
 
-## 2.8. What data does this specification expose to an origin? Please also document what data is identical to data exposed by other features, in the same or different contexts.
-
-EditContext exposes text that has been typed by the user. This data is not exposed to another origin nor does it allow to access data from other origins.
-
-## 2.9. Does this specification enable new script execution/loading mechanisms?
+## 2.9. Do features in this specification enable new script execution/loading mechanisms?
 
 No.
 
@@ -65,6 +69,15 @@ No. A security or privacy section doesn't currently seem warranted given the ans
 ## 2.16. Does this specification allow downgrading default security characteristics?
 
 No.
+
+## 2.17. How does your feature handle non-"fully active" documents?
+
+EditContext cannot receive input in non-"fully active" documents. No explicit state change
+is needed for EditContext when a document becomes not "fully active".
+
+## 2.18. What should this questionnaire have asked?
+
+N/A
 
 # 3. Threat Models
 
