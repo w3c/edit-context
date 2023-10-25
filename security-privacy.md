@@ -32,7 +32,9 @@ No.
 
 ## 2.8. What data does this specification expose to an origin? Please also document what data is identical to data exposed by other features, in the same or different contexts.
 
-EditContext exposes text that has been typed by the user. This data is not exposed to another origin nor does it allow to access data from other origins.
+EditContext exposes text that has been typed by the user. This is the same data that is exposed when an origin has a `contenteditable=""` DOM element or other types of editable fields.
+
+This data is not exposed to another origin nor does it allow to access data from other origins.
 
 ## 2.9. Does this specification enable new script execution/loading mechanisms?
 
