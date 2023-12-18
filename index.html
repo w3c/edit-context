@@ -84,7 +84,7 @@
                 <img src="images/text-input-process.jpg" alt="">
                 <figcaption>A sequence diagram illustrating a typical flow for text input.</figcaption>
             </figure>
-            <p>Existing user agents handle the details of this text input process so that the author’s responsibility ends at declaring what elements of the document represent an editable region.  Authors express which regions are editable using input elements, textarea elements, contenteditable elements, or by setting the designMode attribute to true to mark an entire document as editable. </p>
+            <p>Existing user agents handle the details of this text input process so that the author’s responsibility ends at declaring what elements of the document represent an editable region.  Authors express which regions are editable using input elements, textarea elements, contenteditable elements, or by setting the {{Document/designMode}} attribute to "<code>on</code>" to mark an entire document as editable. </p>
             <p>As an editable region of the document is <a href="https://html.spec.whatwg.org/multipage/interaction.html#focused">focused</a>, the user agent automatically produces the [=Text Edit Context=] from the contents of the editable region and the position of the selection within it.  When a [=Text Input Method=] produces text, the user agent translates the events against its [=Text Edit Context=] into a set of DOM and style modifications – only some of which are described using existing events that an author can handle. </p>
             <p>Authors that want to produce sophisticated editing experiences may be challenged by the current approach.  If, for example, the text and selection are rendered to a canvas, user agents are unable to produce a [=Text Edit Context=] to drive the text input process.  Authors compensate by resorting to offscreen editable elements, but this approach comes with negative implications for accessibility, it deteriorates the input experience, and requires complex code to synchronize the position of the text in the offscreen editable element with the corresponding text in the canvas. </p>
             <p>With the introduction of this EditContext API, authors can more directly participate in the protocol for text input and avoid the pitfalls described above.</p>
@@ -146,8 +146,10 @@
             </p>
             </p>
             <p>
-                If an {{EditContext}}'s <a>associated element</a>'s parent is not
-                <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
+                If an {{EditContext}}'s <a>associated element</a>'s
+                <a href="https://dom.spec.whatwg.org/#concept-tree-parent">parent</a> is not
+                <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a> and
+                is not a [=Document=] whose {{Document/designMode}} attribute is "<code>on</code>",
                 then the <a>associated element</a> becomes an <dfn class="export">EditContext editing host</dfn>.
                 An <a>EditContext editing host</a> is a type of [=editing host=] whose behaviors
                 are described in [[[#edit-context-differences]]].
