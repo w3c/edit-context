@@ -113,8 +113,8 @@
                 <li><dfn>composition start</dfn> which refers to the offset in [=text=] representing the start position of the text being actively composed. The initial value is 0.</p></li>
                 <li><dfn>composition end</dfn> which refers to the offset in [=text=] representing the end position of the text being actively composed. The initial value is 0. [=composition end=] must always be greater than or equal to [=composition start=].</li>
                 <li><dfn>text formats</dfn> which is an array of [=text format=]. The array is initially empty.</li>
-                <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate=] system and the initial x, y, width, and height all 0.</li>
-                <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate=] system and the initial x, y, width, and height are all 0.</li>
+                <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate system=] and the initial x, y, width, and height all 0.</li>
+                <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate system=] and the initial x, y, width, and height are all 0.</li>
                 <li><dfn>codepoint rects start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
                 <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint. The array is initially empty.</li>
             </ul>
@@ -135,6 +135,32 @@
               from the [=Text Input Service=]. The user agent will indicate which positions are
               required by firing {{CharacterBoundsUpdateEvent}}.
             </p>
+            <p>
+              [=Control bounds=], [=selection bounds=], and [=codepoint rects=] are given in the
+              <dfn>client coordinate system</dfn>, which is defined as a two-dimensional Cartesian
+              coordinate system (x, y) where the origin is the top-left corner of the viewport,
+              the x-axis points towards the top-right of the viewport, and the y-axis points towards
+              the bottom-left of the viewport. The units of the client coordinate system are CSS
+              pixels.
+            </p>
+            <div class="note">
+              <p>
+                Since EditContext bounds are defined in
+                <a data-lt="client coordinate system">client coordinates</a>, the coordinates
+                indicating a given piece of content on a page will change as the user scrolls the
+                document even if the content itself does not change position in the document. A
+                scenario where authors may want to take this into account is the case where the user
+                scrolls the page where the user has an active composition. If the author does not
+                update the EditContext's bounds information (e.g. during a scroll event listener),
+                the IME window may no longer line up with the text being composed for the duration
+                of the composition.
+              </p>
+              <p>
+                However, some platforms do not adjust IME windows during an active composition,
+                so updating bounds information mid-composition does not guarantee that the IME
+                window will be repositioned until it's closed and reopened.
+              </p>
+            </div>
             <h4>Association and activation</h4>
             <p>
                 An {{EditContext}} has an <dfn data-for="edit-context">associated element</dfn>, an {{HTMLElement}}.
