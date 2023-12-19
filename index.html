@@ -125,9 +125,10 @@
                 <li><dfn>underline style</dfn>, a {{UnderlineStyle}} which is the preferred underline style of the decorated [=text=] range.</li>
                 <li><dfn>underline thickness</dfn>, a {{UnderlineThickness}} which is the preferred underline thickness of the decorated [=text=] range.</li>
             </ul>
-            <ul>
-
-            </ul>
+            <p class="note">
+              [=Codepoint rects=] provides the means for the user agent to query a range of [=text=] for positioning information.
+              Different platforms may require different positions to be cached to fulfill queries from the [=Text Input Service=].
+            </p>
             <h4>Association and activation</h4>
             <p>
                 An {{EditContext}} has an <dfn data-for="edit-context">associated element</dfn>, an {{HTMLElement}}.
