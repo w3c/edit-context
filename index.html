@@ -115,7 +115,8 @@
                 <li><dfn>text formats</dfn> which is an array of [=text format=]. The array is initially empty.</li>
                 <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate=] system and the initial x, y, width, and height all 0.</li>
                 <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate=] system and the initial x, y, width, and height are all 0.</li>
-                <li><dfn>codepoint locations</dfn> which is an array of [=codepoint location=]. The array is initially empty.</li>
+                <li><dfn>codepoint rects start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
+                <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint. The array is initially empty.</li>
             </ul>
             <p><dfn>text format</dfn> is a struct that indicates decorative properties that should be applied to the ranges of [=text=].  The struct contains:</p>
             <ul>
@@ -124,16 +125,15 @@
                 <li><dfn>underline style</dfn>, a {{UnderlineStyle}} which is the preferred underline style of the decorated [=text=] range.</li>
                 <li><dfn>underline thickness</dfn>, a {{UnderlineThickness}} which is the preferred underline thickness of the decorated [=text=] range.</li>
             </ul>
-            <p><dfn>codepoint location</dfn> is a struct that captures the location (in [=client coordinate=]s) of codepoints from [=text=].  Each struct represents a contigious run of codepoints starting at an offset within [=text=] indicated by [=start index=].  The struct contains:</p>
-            <ul>
-                <li><dfn>start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
-                <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint.</li>
-            </ul>
             <p class="note">
-                [=Codepoint locations=] provides the means for the user agent to query multiple ranges of [=text=] for positioning information.
-                Different platforms may require different positions to be cached to fulfill queries from the [=Text Input Service=] and this API shape allows for that flexibility.
-                It would be good if the API could be simplified to require just the positions of the actively composed text along with the [=selection bounds=] and [=control bounds=].
-                Exploration is needed to see if that is possible.
+              [=Codepoint rects=] provides the means for the user agent to query a range of
+              [=text=] for positioning information. The [=Text Input Service=] will use this
+              information, in tandem with the [=control bounds=] and [=selection bounds=], to
+              support the Text Input Method in properly displaying its user interface. For example,
+              the info can be used to position an IME window adjacent to text being composed.
+              Different platforms may require different positions to be cached to fulfill queries
+              from the [=Text Input Service=]. The user agent will indicate which positions are
+              required by firing {{CharacterBoundsUpdateEvent}}.
             </p>
             <h4>Association and activation</h4>
             <p>
@@ -986,7 +986,7 @@ interface EditContext : EventTarget {
             <dd>The {{EditContext/characterBounds}} getter steps are to return [=this=]'s [=codepoint rects=].</dd>
 
             <dt>characterBoundsRangeStart</dt>
-            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=start index=].</dd>
+            <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=codepoint rects start index=].</dd>
 
             <dt>updateText() method</dt>
             <dd>
@@ -1091,7 +1091,7 @@ interface EditContext : EventTarget {
                     </dl>
                     <ol>
                         <li>
-                            set [=start index=] to |rangeStart|.
+                            set [=codepoint rects start index=] to |rangeStart|.
                         </li>
                         <li>
                             set [=codepoint rects=] to |characterBounds|.
