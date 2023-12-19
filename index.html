@@ -126,8 +126,13 @@
                 <li><dfn>underline thickness</dfn>, a {{UnderlineThickness}} which is the preferred underline thickness of the decorated [=text=] range.</li>
             </ul>
             <p class="note">
-              [=Codepoint rects=] provides the means for the user agent to query a range of [=text=] for positioning information.
-              Different platforms may require different positions to be cached to fulfill queries from the [=Text Input Service=].
+              [=Codepoint rects=] provides the means for the user agent to query a range of
+              [=text=] for positioning information. The [=Text Input Service=] will use this
+              information, in tandem with the [=control bounds=] and [=selection bounds=], to
+              support the Text Input Method in properly displaying its user interface. For example,
+              the info can be used to position an IME window adjacent to text being composed.
+              Different platforms may require different positions to be cached to fulfill queries
+              from the [=Text Input Service=].
             </p>
             <h4>Association and activation</h4>
             <p>
