@@ -113,8 +113,8 @@
                 <li><dfn>composition start</dfn> which refers to the offset in [=text=] representing the start position of the text being actively composed. The initial value is 0.</p></li>
                 <li><dfn>composition end</dfn> which refers to the offset in [=text=] representing the end position of the text being actively composed. The initial value is 0. [=composition end=] must always be greater than or equal to [=composition start=].</li>
                 <li><dfn>text formats</dfn> which is an array of [=text format=]. The array is initially empty.</li>
-                <li><dfn>control bounds</dfn> is a rectangle describing the area of the screen in which [=text=] is displayed.  It is in the [=client coordinate system=] and the initial x, y, width, and height all 0.</li>
-                <li><dfn>selection bounds</dfn> is the rectangle describing the position of selection. It is in the [=client coordinate system=] and the initial x, y, width, and height are all 0.</li>
+                <li><dfn>control bounds</dfn> is a {{DOMRect}} describing the area of the viewport in which [=text=] is displayed.  It is in the [=client coordinate system=] and the initial x, y, width, and height are all 0.</li>
+                <li><dfn>selection bounds</dfn> is a {{DOMRect}} describing the position of selection. It is in the [=client coordinate system=] and the initial x, y, width, and height are all 0.</li>
                 <li><dfn>codepoint rects start index</dfn> which is an offset into [=text=] that respresents the position before the first codepoint whose location is reported by the first member of [=codepoint rects=] array.</li>
                 <li><dfn>codepoint rects</dfn> is an array of {{DOMRect}} defining the bounding box of each codepoint. The array is initially empty.</li>
             </ul>
