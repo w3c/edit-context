@@ -108,7 +108,7 @@
             <ul>
                 <li><dfn>text</dfn> which is a {{DOMString}} representing editable content. The initial value is the empty string.</li>
                 <li><dfn>selection start</dfn> which refers to the offset in [=text=] where the selection starts. The initial value is 0.</li>
-                <li><dfn>selection end</dfn> which refers to the offset in [=text=] where the selection ends. The initial value is 0. [=selection end=] must always be greater than or equal to [=selection start=].</li>
+                <li><dfn>selection end</dfn> which refers to the offset in [=text=] where the selection ends. The initial value is 0. [=selection end=] may be less than [=selection start=] in the case of a "backwards" selection (in reverse of document order).</li>
                 <li><dfn>is composing</dfn> which indicates if there is an active composition. The initial value is false.</li>
                 <li><dfn>composition start</dfn> which refers to the offset in [=text=] representing the start position of the text being actively composed. The initial value is 0.</p></li>
                 <li><dfn>composition end</dfn> which refers to the offset in [=text=] representing the end position of the text being actively composed. The initial value is 0. [=composition end=] must always be greater than or equal to [=composition start=].</li>
@@ -1026,9 +1026,6 @@ interface EditContext : EventTarget {
                         <dd>None</dd>
                     </dl>
                     <ol>
-                        <li>
-                            If |start| > |end|, abort these steps.
-                        </li>
                         <li>
                             set [=selection start=] to |start|
                         </li>
