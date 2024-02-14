@@ -1035,9 +1035,7 @@ interface EditContext : EventTarget {
                 <ol>
                     <li>
                         Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|
-                    </li>
-                    <li>
-                        <div class="note">Add details regarding rangeStart/rangeEnd vs. [=selection start=]/[=selection end=]</div>
+                        <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be replaced in the same way as when |rangeStart| <= |rangeEnd|.</div>
                     </li>
                 </ol>
             </div>
