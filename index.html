@@ -1119,10 +1119,13 @@ interface EditContext : EventTarget {
                     </dl>
                     <ol>
                         <li>
-                            set [=selection start=] to |start|
+                            If [=selection start=] is not equal to |start| or [=selection end=] is not equal to |end|, then set [=is composing=] to false.
                         </li>
                         <li>
-                            set [=selection end=] to |end|
+                            Set [=selection start=] to |start|.
+                        </li>
+                        <li>
+                            Set [=selection end=] to |end|.
                         </li>
                     </ol>
                 </div>
