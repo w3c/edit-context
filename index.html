@@ -1058,9 +1058,27 @@ interface EditContext : EventTarget {
                 </dl>
                 <ol>
                     <li>
-                        Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|
-                        <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be replaced in the same way as when |rangeStart| <= |rangeEnd|.</div>
+                        If |rangeStart| > |rangeEnd|, then swap the values of |rangeStart| and |rangeEnd|.
                     </li>
+                    <li>
+                        Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|.
+                    </li>
+                    <li>
+                        If [=selection start=] is greater than |rangeEnd|, then set [=selection start=] to [=selection start=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
+                    </li>
+                    <li>
+                        If [=selection start=] is less greater than |rangeStart| and less than |rangeEnd|, then set [=selection start=] to |rangeStart| plus the length of |newText|.
+                    </li>
+                    <li>
+                        If [=selection end=] is greater than |rangeEnd|, then set [=selection end=] to [=selection end=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
+                    </li>
+                    <li>
+                        If [=selection end=] is less greater than |rangeStart| and less than |rangeEnd|, then set [=selection end=] to |rangeStart| plus the length of |newText|.
+                    </li>
+                    <p class="note">
+                        In other words, both selection boundary points are updated such that if they were after the affected range, they're offset by the overall change to the text length. If they were within the affected range, they're moved to the end of the new text.
+                        If they were before the affected range, they're left unchanged.
+                    </p>
                 </ol>
             </div>
             </dd>
