@@ -1067,18 +1067,40 @@ interface EditContext : EventTarget {
                         If [=selection start=] is greater than |rangeEnd|, then set [=selection start=] to [=selection start=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
                     </li>
                     <li>
-                        If [=selection start=] is less greater than |rangeStart| and less than |rangeEnd|, then set [=selection start=] to |rangeStart| plus the length of |newText|.
+                        If [=selection start=] is greater than |rangeStart| and less than |rangeEnd|, then set [=selection start=] to |rangeStart| plus the length of |newText|.
                     </li>
                     <li>
                         If [=selection end=] is greater than |rangeEnd|, then set [=selection end=] to [=selection end=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
                     </li>
                     <li>
-                        If [=selection end=] is less greater than |rangeStart| and less than |rangeEnd|, then set [=selection end=] to |rangeStart| plus the length of |newText|.
+                        If [=selection end=] is greater than |rangeStart| and less than |rangeEnd|, then set [=selection end=] to |rangeStart| plus the length of |newText|.
                     </li>
                     <p class="note">
                         In other words, both selection boundary points are updated such that if they were after the affected range, they're offset by the overall change to the text length. If they were within the affected range, they're moved to the end of the new text.
                         If they were before the affected range, they're left unchanged.
                     </p>
+                    <li>
+                        If [=is composing=] is true, then:
+                        <ol>
+                            <li>
+                                If min([=composition start=], [=composition end=]) is less than |rangeEnd| and max([=composition start=], [=composition end=]) is greater than |rangeStart|, then:
+                                <ol>
+                                    <li>Set [=is composing=] to false.</li>
+                                </ol>
+                            </li>
+                            <li>
+                                Otherwise:
+                                <ol>
+                                    <li>
+                                        If [=composition start=] is greater than |rangeEnd|, then set [=composition start=] to [=composition start=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
+                                    </li>
+                                    <li>
+                                        If [=composition end=] is greater than |rangeEnd|, then set [=composition end=] to [=composition end=] plus the length of |newText| minus (|rangeEnd| minus |rangeStart|).
+                                    </li>
+                                </ol>
+                            </li>
+                        </ol>
+                    </li>
                 </ol>
             </div>
             </dd>
