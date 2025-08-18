@@ -258,6 +258,11 @@
                         event as specified in [[uievents]].
                     </li>
                     <li>
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not fire the
+                        <a href="https://www.w3.org/TR/uievents/#events-compositionevents">composition events</a> against the
+                        <a>EditContext editing host</a>, instead they must be fired against the {{EditContext}}.
+                    </li>
+                    <li>
                         When a <code>&lt;canvas&gt;</code> element is used as the [=associated element=], the browser's spellcheck
                         cannot be used, and the author has to implement selection and caret navigation.
                     </li>
