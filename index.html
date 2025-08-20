@@ -234,7 +234,8 @@
                         Each child node of the <a>EditContext editing host</a> becomes <a href="https://w3c.github.io/editing/docs/execCommand/#editable">editable</a>,
                         unless that node has a [^html-global/contenteditable^] attribute set to "<code>false</code>".
                     </li>
-                    <li>The user agent handles focus and caret navigation for any editable element in the <a>EditContext editing host</a>.</li>
+                    <li>The user agent handles focus and caret navigation for any editable element in the <a>EditContext editing host</a> (except when the
+                        [=associated element=] is a [=canvas=]; see below in this section).</li>
                     <li>
                         The <a>EditContext editing host</a> receives key events and the <a href="https://www.w3.org/TR/uievents/#event-type-beforeinput">beforeinput</a>
                         event as specified in [[uievents]].
@@ -256,6 +257,28 @@
                         <a href="https://www.w3.org/TR/uievents/#event-type-input">input</a> event
                         against the <a>EditContext editing host</a> as a direct result of user action
                         event as specified in [[uievents]].
+                    </li>
+                    <li>
+                        When the {{Document}} being edited has an [=active EditContext=], the user agent must not fire
+                        <a href="https://www.w3.org/TR/uievents/#events-compositionevents">composition events</a> against the
+                        <a>EditContext editing host</a> as a direct result of user action. Instead they will be fired against the {{EditContext}} as part
+                        of [=update the EditContext|updating the EditContext=] or [=deactivate an EditContext|deactivating the EditContext=].
+                    </li>
+                    <li>
+                        <p>
+                            When the [=active EditContext=]'s [=associated element=] is a [=canvas=], there are further differences:
+                        </p>
+                        <ul>
+                            <li>
+                                The user agent is unable to handle caret navigation and selection since it doesn't have information
+                                about how text is laid out in the [=canvas=], so the author has to implement caret navigation and selection.
+                            </li>
+                            <li>
+                                The user agent is unable to present inline spelling and grammar suggestions since it doesn't have information
+                                about how the text is laid out in the [=canvas=], so if the author wants to support spelling and grammar suggestions,
+                                they have to implement that themselves.
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
