@@ -696,10 +696,16 @@
                                 <ol>
                                     <li>If |editContext|'s <a>associated element</a> is equal to [=this=], then terminate these steps.</li>
                                     <li>If |editContext|'s <a>associated element</a> is not null, then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.</li>
-                                    <li>Set |editContext|'s <a>associated element</a> to [=this=].</li>
                                 </ol>
                             </li>
                             <li>Let |oldEditContext| be the value of [=this=]'s internal [[\EditContext]] slot.</li>
+                            <li>
+                                If |oldEditContext| is not null and |oldEditContext| is [=this=]'s
+                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s
+                                [=active EditContext=], then run the steps to [=deactivate an EditContext=]
+                                with |oldEditContext|.
+                            </li>
+                            <li>If |editContext| is not null, then set |editContext|'s <a>associated element</a> to [=this=].
                             <li>If |oldEditContext| is not null, then:
                                 <ol>
                                     <li>[=Assert=]: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
@@ -707,12 +713,6 @@
                                 </ol>
                             </li>
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
-                            <li>
-                                If |oldEditContext| is not null and |oldEditContext| is [=this=]'s
-                                <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s
-                                [=active EditContext=], then run the steps to [=deactivate an EditContext=]
-                                with |oldEditContext|.
-                            </li>
                         </ol>
                     </div><!-- algorithm -->
                 </dd>
