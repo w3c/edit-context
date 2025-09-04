@@ -705,13 +705,16 @@
                                 [=active EditContext=], then run the steps to [=deactivate an EditContext=]
                                 with |oldEditContext|.
                             </li>
-                            <li>If |editContext| is not null, then set |editContext|'s <a>associated element</a> to [=this=].
-                            <li>If |oldEditContext| is not null, then:
-                                <ol>
-                                    <li>[=Assert=]: |oldEditContext|'s <a>associated element</a> is equal to [=this=].</li>
-                                    <li>Set |oldEditContext|'s <a>associated element</a> to null.</li>
-                                </ol>
+                            <li>
+                                If |oldEditContext| is not null and |oldEditContext|'s <a>associated element</a> is not equal to [=this=], then
+                                terminate these steps.
                             </li>
+                            <li>
+                                If |editContext| is not null, |editContext|'s <a>associated element</a> is not null and |editContext|'s
+                                <a>associated element</a> is not equal to [=this=], then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.
+                            </li>
+                            <li>If |oldEditContext| is not null, set |oldEditContext|'s <a>associated element</a> to null.</li>
+                            <li>If |editContext| is not null, then set |editContext|'s <a>associated element</a> to [=this=].
                             <li>Set [=this=]'s internal [[\EditContext]] slot to be |editContext|.</li>
                         </ol>
                     </div><!-- algorithm -->
