@@ -702,16 +702,17 @@
                             <li>
                                 If |oldEditContext| is not null and |oldEditContext| is [=this=]'s
                                 <a href="https://dom.spec.whatwg.org/#concept-node-document">node document</a>'s
-                                [=active EditContext=], then run the steps to [=deactivate an EditContext=]
-                                with |oldEditContext|.
-                            </li>
-                            <li>
-                                If |oldEditContext| is not null and |oldEditContext|'s <a>associated element</a> is not equal to [=this=], then
-                                terminate these steps.
-                            </li>
-                            <li>
-                                If |editContext| is not null, |editContext|'s <a>associated element</a> is not null and |editContext|'s
-                                <a>associated element</a> is not equal to [=this=], then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.
+                                [=active EditContext=], then:
+                                <ol>
+                                    <li>Run the steps to [=deactivate an EditContext=] with |oldEditContext|.</li>
+                                    <li>
+                                        If |oldEditContext|'s <a>associated element</a> is not equal to [=this=], then terminate these steps.
+                                    </li>
+                                    <li>
+                                        If |editContext| is not null, |editContext|'s <a>associated element</a> is not null and |editContext|'s
+                                        <a>associated element</a> is not equal to [=this=], then [=exception/throw=] a {{"NotSupportedError"}} {{DOMException}}.
+                                    </li>
+                                </ol>
                             </li>
                             <li>If |oldEditContext| is not null, set |oldEditContext|'s <a>associated element</a> to null.</li>
                             <li>If |editContext| is not null, then set |editContext|'s <a>associated element</a> to [=this=].
