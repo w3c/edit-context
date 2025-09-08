@@ -1282,6 +1282,11 @@ interface TextFormatUpdateEvent : Event {
                 <dd>Returns [=this=]'s [=text format list=].</dd>
             </dl>
             <p>A {{TextFormatUpdateEvent}} has an associated <dfn>text format list</dfn>, a list of zero or more [=text format=]s.</p>
+            <p class="note">
+              User agents can adjust the underline style or thickness before dispatching the {{TextFormatUpdateEvent}} 
+              to ensure proper contrast with the content or to mitigate fingerprinting risks. This may be especially
+              relevant when input methods with distinctive styling characteristics are used.
+            </p>
         </section>
         <section>
             <h3>CharacterBoundsUpdateEvent</h3>
