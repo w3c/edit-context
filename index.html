@@ -299,10 +299,19 @@
                     the changes back to the page's view so the user can see what they are typing.
                 </li>
                 <li>
-                    The user agent must fire {{TextFormatUpdateEvent}} when the [=Text Input Service=]
-                    indicates that certain formats should be applied to the text being composed. When
-                    the author receives this event, they must render the formatting change back to
-                    the page's view to aid the user with their IME composition.</li>
+                    <p>
+                        The user agent must fire {{TextFormatUpdateEvent}} when the [=Text Input Service=]
+                        indicates that certain formats should be applied to the text being composed. When
+                        the author receives this event, they must render the formatting change back to
+                        the page's view to aid the user with their IME composition.
+                    </p>
+                    <p class="note">
+                        User agents can adjust the {{UnderlineStyle}} or {{UnderlineThickness}} before
+                        dispatching the {{TextFormatUpdateEvent}} to mitigate fingerprinting risks. This may
+                        be especially relevant when input methods with distinctive styling characteristics
+                        are used.
+                    </p>
+                </li>
                 <li>
                     <p>
                         The user agent must fire {{CharacterBoundsUpdateEvent}} when the
