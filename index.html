@@ -885,10 +885,10 @@
     <ol>
         <li>Let |oldActiveEditContext| be |document|'s [=active EditContext=].</li>
         <li>Let |newActiveEditContext| be the result of running the steps to [=determine the active EditContext=] given |document|.</li>
-        <li>If |oldActiveEditContext| is not null, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
+        <li>If |oldActiveEditContext| is not null and is not equal to |newActiveEditContext|, then run the steps to [=deactivate an EditContext=] given |oldActiveEditContext|.</li>
         <li>If |newActiveEditContext| is not null, then:
             <ol>
-                <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |editContext|'s [=text state=].</li>
+                <li>Update the [=Text Edit Context=]'s [=text state=] to match the values in |newActiveEditContext|'s [=text state=].</li>
             </ol>
         </li>
         <li>Set the |document|'s [=active EditContext=] to |newActiveEditContext|.</li>
@@ -975,11 +975,15 @@
         <dd>None</dd>
     </dl>
     <ol>
-        <li>Set |editContext|'s [=is composing=] to false.</li>
-        <li>
-            [=Fire an event=] named
-            <a href="https://w3c.github.io/uievents/#event-type-compositionend">compositionend</a>
-            at |editContext| using {{CompositionEvent}}.
+        <li>If |editContext|'s [=is composing=] is true, then:
+            <ol>
+                <li>Set |editContext|'s [=is composing=] to false.</li>
+                <li>
+                    [=Fire an event=] named
+                    <a href="https://w3c.github.io/uievents/#event-type-compositionend">compositionend</a>
+                    at |editContext| using {{CompositionEvent}}.
+                </li>
+            </ol>
         </li>
     </ol>
 </div><!-- algorithm -->
