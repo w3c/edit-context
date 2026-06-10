@@ -1098,7 +1098,7 @@ interface EditContext : EventTarget {
                 <ol>
                     <li>
                         Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|
-                        <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be replaced in the same way as when |rangeStart| <= |rangeEnd|.</div>
+                        <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be replaced in the same way as if |rangeStart| and |rangeEnd| were swapped.</div>
                     </li>
                 </ol>
             </div>
@@ -1220,8 +1220,6 @@ interface EditContext : EventTarget {
     DOMString text = "";
     unsigned long selectionStart = 0;
     unsigned long selectionEnd = 0;
-    unsigned long compositionStart = 0;
-    unsigned long compositionEnd = 0;
 };
 
 [Exposed=Window]
