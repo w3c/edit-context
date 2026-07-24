@@ -651,6 +651,88 @@
             </aside>            
 
         </section>
+        <section class="informative" id="accessibility">
+            <h3>Accessibility</h3>
+            <p>
+                An EditContext's [=text=] useful for text input methods,
+                but since it is just a string, it cannot have any formatting, such as
+                paragraph divisions and bold/emphasized text,
+                or interactive elements, such as hyperlinks and buttons.
+                For this reason, it is <strong>not</strong> exposed to assistive technologies such as screen readers.
+                So in order for an EditContext editor to be fully accessible, it must also render its contents
+                in an accessible format to the DOM.
+            </p>
+            <p>
+                Just like with <code>contenteditable</code>, EditContext editors
+                should be given the attribute
+                <a href="https://w3c.github.io/aria/#textbox"><code>role="textbox"</code></a>,
+                an appropriate label with the
+                <a href="https://w3c.github.io/aria/#aria-label"><code>aria-label</code></a> or
+                <a href="https://w3c.github.io/aria/#aria-labelledby"><code>aria-labelledby</code></a>
+                attribute, and if the editor allows for more than one line of text,
+                <a href="https://w3c.github.io/aria/#aria-multiline"><code>aria-multiline="true"</code></a>
+                should also be set.
+                The DOM contents of the editor should use the appropriate elements
+                and/or ARIA attributes to communicate the semantics of the editor contents.
+                For example, <code>&lt;p&gt;</code> tags (or another element with
+                <a href="https://w3c.github.io/aria/#paragraph"><code>role="paragraph"</code></a>)
+                should be used for paragraphs,
+                and line numbers in a code editor should have
+                <a href="https://w3c.github.io/aria/#aria-hidden"><code>aria-hidden="true"</code></a>
+                so that they are not announced by screen readers.
+                The selection in the EditContext must be kept in sync with the selection in the rendered DOM content
+                to ensure that assistive technologies work correctly.
+            </p>
+            <p>
+                When an EditContext is attached to a canvas, further care must be taken to ensure that the editor is accessible.
+                Alternative content must be provided for assistive technologies, using child elements of the canvas.
+                Furthermore, the text in the alternative content should be in the same position on screen as the text
+                rendered to the canvas, to ensure that accessibility features which require the position of the text
+                work correctly (such as Windows Narrator highlighting the announced text).
+            </p>
+            <aside class="issue">
+                <p>
+                    Some browsers don't compute layout for descendants of canvas elements, so the paragraph
+                    above may need revising
+                    (<a href="https://github.com/w3c/edit-context/issues/139">issue #139</a>).
+                </p>
+            </aside>
+            <aside class="example" title="Providing accessible alternative content for EditContext attached to a canvas element.">
+                <p>
+                    A real editor would likely include formatting such as paragraphs, bolded text, links, etc.,
+                    which should be represented with DOM elements in the alternative content.
+                    For the sake of simplicity, this example just uses a text node.
+                </p>
+                <pre>
+&lt;canvas aria-label="Example editor" role="textbox" aria-multiline="true"&gt;
+    &lt;div id="alt" style="white-space: pre;"&gt;&lt;/div&gt;
+&lt;/canvas&gt;
+&lt;script&gt;
+const host = document.querySelector('canvas');
+const alt = new Text('');
+document.getElementById('alt').append(alt);
+host.editContext = new EditContext();
+// host.editContext.updateControlBounds(…);
+
+host.editContext.addEventListener('textupdate', e =&gt; {
+    // Update alternative content text to match EditContext text.
+    alt.replaceData(e.updateRangeStart, e.updateRangeEnd, e.text);
+    // Update alternative content selection to match EditContext selection.
+    getSelection().setBaseAndExtent(
+        alt, e.selectionStart,
+        alt, e.selectionEnd
+    );
+    // host.editContext.updateSelectionBounds(…);
+    // (Draw the text and selection to the canvas,
+    //  ensuring that the position of the text rendered to the canvas
+    //  matches its position in the alternative content.)
+});
+
+// (Event listeners for textformatupdate, characterboundsupdate)
+&lt;/script&gt;
+                </pre>
+            </aside>
+        </section>
     </section>
     <section id="conformance">
         <p>
