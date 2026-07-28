@@ -1046,6 +1046,9 @@ interface EditContext : EventTarget {
     sequence&lt;HTMLElement&gt; attachedElements();
 
     readonly attribute DOMString text;
+    readonly attribute unsigned long textLength;
+    DOMString getText(unsigned long rangeStart, unsigned long rangeEnd);
+
     readonly attribute unsigned long selectionStart;
     readonly attribute unsigned long selectionEnd;
     readonly attribute unsigned long characterBoundsRangeStart;
@@ -1072,6 +1075,38 @@ interface EditContext : EventTarget {
 
             <dt>characterBoundsRangeStart</dt>
             <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=codepoint rects start index=].</dd>
+
+            <dt>textLength</dt>
+            <dd>The {{EditContext/textLength}} getter steps are to return [=this=]'s [=text=]'s length.</dd>
+
+            <dt>getText() method</dt>
+            <dd>
+              <p>
+                The method must follow these steps:
+              </p>
+              <div class="algorithm">
+                <dl>
+                    <dt>Input</dt>
+                    <dd>|rangeStart|, an unsigned long</dd>
+                    <dd>|rangeEnd|, an unsigned long</dd>
+                    <dt>Output</dt>
+                    <dd>A {{DOMString}}</dd>
+                </dl>
+                <ol>
+                    <li>
+                        If |rangeStart| is greater than the length of [=text=],
+                        set |rangeStart| to the length of [=text=].
+                    </li>
+                    <li>
+                        If |rangeEnd| is greater than the length of [=text=],
+                        set |rangeEnd| to the length of [=text=].
+                    </li>
+                    <li>
+                        Return the substring of [=text=] in the range of |rangeStart| and |rangeEnd|.
+                        <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be retrieved in the same way as if |rangeStart| and |rangeEnd| were swapped.</div>
+                    </li>
+                </ol>
+            </dd>
 
             <dt>updateText() method</dt>
             <dd>
