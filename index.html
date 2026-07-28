@@ -1171,6 +1171,10 @@ interface EditContext : EventTarget {
                     </dl>
                     <ol>
                         <li>
+                            If |rangeStart| plus the length of |characterBounds| is greater than
+                            [=text=]'s length, throw a {{RangeError}}.
+                        </li>
+                        <li>
                             set [=codepoint rects start index=] to |rangeStart|.
                         </li>
                         <li>
