@@ -1080,6 +1080,36 @@ interface EditContext : EventTarget {
             <dt>characterBoundsRangeStart</dt>
             <dd>The {{EditContext/characterBoundsRangeStart}} getter steps are to return [=this=]'s [=codepoint rects start index=].</dd>
 
+            <dt>EditContext() constructor</dt>
+            <dd>
+                <p>
+                    The constructor must follow these steps:
+                </p>
+                <div class="algorithm">
+                    <dl>
+                        <dt>Input</dt>
+                        <dd>|options|, an {{EditContextInit}}</dd>
+                        <dt>Output</dt>
+                        <dd>None</dd>
+                    </dl>
+                    <ol>
+                        <li>
+                            Set [=text=] to |options|["{{EditContextInit/text}}"].
+                        </li>
+                        <li>
+                            If |options|["{{EditContextInit/selectionStart}}"] or |options|["{{EditContextInit/selectionEnd}}"]
+                            is greater than the length of [=text=], throw a {{RangeError}}.
+                        </li>
+                        <li>
+                            Set [=selection start=] to |options|["{{EditContextInit/selectionStart}}"].
+                        </li>
+                        <li>
+                            Set [=selection end=] to |options|["{{EditContextInit/selectionStart}}"].
+                        </li>
+                    </ol>
+                </div>
+            </dd>
+
             <dt>updateText() method</dt>
             <dd>
               <p>
@@ -1096,8 +1126,24 @@ interface EditContext : EventTarget {
                 </dl>
                 <ol>
                     <li>
+                        If |rangeStart| is greater than the length of [=text=],
+                        set |rangeStart| to the length of [=text=].
+                    </li>
+                    <li>
+                        If |rangeEnd| is greater than the length of [=text=],
+                        set |rangeEnd| to the length of [=text=].
+                    </li>
+                    <li>
                         Replace the substring of [=text=] in the range of |rangeStart| and |rangeEnd| with |newText|
                         <div class="note">It's permissible that |rangeStart| > |rangeEnd|. The substring between the indices should be replaced in the same way as if |rangeStart| and |rangeEnd| were swapped.</div>
+                    </li>
+                    <li>
+                        If [=selection start=] is greater than the length of [=text=], set
+                        [=selection start=] to the length of [=text=].
+                    </li>
+                    <li>
+                        If [=selection end=] is greater than the length of [=text=], set
+                        [=selection end=] to the length of [=text=].
                     </li>
                 </ol>
             </div>
@@ -1116,6 +1162,10 @@ interface EditContext : EventTarget {
                         <dd>None</dd>
                     </dl>
                     <ol>
+                        <li>
+                            If |start| or |end| is greater than the length of [=text=],
+                            throw a {{RangeError}}.
+                        </li>
                         <li>
                             set [=selection start=] to |start|
                         </li>
