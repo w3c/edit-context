@@ -841,7 +841,10 @@
                 <li>Set |editContext|'s [=selection end=] to |selectionEnd|.</li>
                 <li>Set |editContext|'s [=composition start=] to |insertionStart|.</li>
                 <li>Set |editContext|'s [=composition end=] to |editContext|'s [=composition start=] plus the length of |text|.</li>
-                <li>[=Dispatch text update event=] given |editContext| and |text|.</li>
+                <li>
+                    [=Dispatch text update event=] given |editContext|, |text|, the minimum of |insertionStart| and |insertionEnd|,
+                    and the maximum of |insertionStart| and |insertionEnd|.
+                </li>
                 <li>
                     If |editContext|'s [=is composing=] is true, then:
                     <ol>
@@ -893,14 +896,18 @@
                 <dt>Input</dt>
                 <dd>|editContext|, an {{EditContext}}</dd>
                 <dd>|text|, a string</dd>
+                <dd>|updateRangeStart|, an offset into |editContext|'s previous {{EditContext/text}}</dd>
+                <dd>|updateRangeEnd|, an offset into |editContext|'s previous {{EditContext/text}}</dd>
                 <dt>Output</dt>
                 <dd>None</dd>
             </dl>
     <ol>
         <li>
             [=Fire an event=] named "textupdate" at |editContext| using {{TextUpdateEvent}}, with
+            {{TextUpdateEvent/updateRangeStart}} initialized to |updateRangeStart|,
+            {{TextUpdateEvent/updateRangeEnd}} initialized to |updateRangeEnd|,
             {{TextUpdateEvent/text}} initialized to |text|,
-            {{TextUpdateEvent/selectionStart}} initialized to ||editContext|'s [=selection start=], and
+            {{TextUpdateEvent/selectionStart}} initialized to |editContext|'s [=selection start=], and
             {{TextUpdateEvent/selectionEnd}} initialized to |editContext|'s [=selection end=].
         </li>
     </ol>
