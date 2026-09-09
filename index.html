@@ -124,6 +124,12 @@
                 <li><dfn>range end</dfn> which is an offset into [=text=] that respresents the position after the last codepoint that should be decorated.</li>
                 <li><dfn>underline style</dfn>, a {{UnderlineStyle}} which is the preferred underline style of the decorated [=text=] range.</li>
                 <li><dfn>underline thickness</dfn>, a {{UnderlineThickness}} which is the preferred underline thickness of the decorated [=text=] range.</li>
+                <li><dfn>text color</dfn>, an empty string or <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb"
+                    >a CSS serialization of sRGB values</a>,
+                    indicating the preferred text color of the decorated [=text=] range.</li>
+                <li><dfn>background color</dfn>, an empty string or <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb"
+                    >a CSS serialization of sRGB values</a>,
+                    indicating the preferred background color of the decorated [=text=] range.</li>
             </ul>
             <p class="note">
               [=Codepoint rects=] provides the means for the user agent to query a range of
@@ -934,6 +940,8 @@
             <li>Set |textFormat|'s {{TextFormat/rangeEnd}} to |format|'s [=range end=].</li>
             <li>Set |textFormat|'s {{TextFormat/underlineStyle}} to |format|'s [=underline style=].</li>
             <li>Set |textFormat|'s {{TextFormat/underlineThickness}} to |format|'s [=underline thickness=].</li>
+            <li>Set |textFormat|'s {{TextFormat/textColor}} to |format|'s [=text color=].</li>
+            <li>Set |textFormat|'s {{TextFormat/backgroundColor}} to |format|'s [=background color=].</li>
             <li>Append |textFormat| to |formats|</li>
         </ol>
     </li>
@@ -1257,6 +1265,8 @@ dictionary TextFormatInit {
     unsigned long rangeEnd = 0;
     UnderlineStyle underlineStyle = "none";
     UnderlineThickness underlineThickness = "none";
+    DOMString textColor = "";
+    DOMString backgroundColor = "";
 };
 
 [Exposed=Window]
@@ -1266,6 +1276,8 @@ interface TextFormat {
     readonly attribute unsigned long rangeEnd;
     readonly attribute UnderlineStyle underlineStyle;
     readonly attribute UnderlineThickness underlineThickness;
+    readonly attribute DOMString textColor;
+    readonly attribute DOMString backgroundColor;
 };
 
 dictionary TextFormatUpdateEventInit : EventInit {
@@ -1286,6 +1298,14 @@ interface TextFormatUpdateEvent : Event {
                 <dd>The preferred underline style of the decorated text range.</dd>
                 <dt>{{TextFormat/underlineThickness}}, of type {{UnderlineThickness}}, readonly</dt>
                 <dd> The preferred underline thickness of the decorated text range.</dd>
+                <dt>{{TextFormat/textColor}}, of type {{DOMString}}, readonly</dt>
+                <dd>The preferred text color of the decorated text range represented as
+                    <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb">a CSS serialization of sRGB values</a>,
+                    or an empty string to indicate no preferred text color.</dd>
+                <dt>{{TextFormat/backgroundColor}}, of type {{DOMString}}, readonly</dt>
+                <dd>The preferred background color of the decorated text range represented as
+                    <a href="https://www.w3.org/TR/css-color-4/#css-serialization-of-srgb">a CSS serialization of sRGB values</a>,
+                    or an empty string to indicate no preferred background color.</dd>
                 <dt>{{TextFormatUpdateEvent/getTextFormats}} method
                 </dt>
                 <dd>Returns [=this=]'s [=text format list=].</dd>
