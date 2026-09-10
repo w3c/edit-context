@@ -1,6 +1,6 @@
 # EditContext API Explainer
 ## Introduction
-The EditContext is a new API that simplifies the process of integrating a web app with [advanced text input methods](#example-text-input-methods), improves accessibility and performance, and unlocks new capabilities for web-based editors.
+The EditContext is a new API that simplifies the process of integrating a web app with [advanced text input methods](#example-text-input-methods), improves performance, and unlocks new capabilities for web-based editors.
 
 ## Motivation
 The web platform provides out-of-the-box editing experiences for single lines of plain-text (input), small amounts of multi-line plain-text (textarea) and a starting point for building an HTML document editing experience (contenteditable elements).
@@ -12,14 +12,6 @@ This contradiction of needing an editable element, but not wanting it to be visi
 An alternative is to incorporate a contenteditable element into the view of the editor, regardless of whether the editor is editing an HTML document.  This approach limits the editor's flexibilty in modifying the view, since the view is also powering the text input experience.
 
 ## Real-world Examples of Text Input Issues in Top Sites and Frameworks
-### Accessibility Issues in the Monaco Editor
-[This video](https://www.youtube.com/watch?v=xzC86EG9lPo) demos Windows Narrator reading from a hidden textarea element in the Monaco editor and compares it with the intended experience by showing Narrator reading text from CKEditor, which uses a contenteditable element as part of its view.
-
-Monaco edits plain text - it's a code editor. The plain text document is presented using a rich view created from HTML, but a hidden textarea is used to integrate with the text input services of the OS.  This approach makes the hidden textarea the accessibile surface for the editable content being edited.
-
-Two aspects of accessibility suffer as a result:
-  1. The focused element is off screen so narrator doesn't place a blue outline around the words as they are read aloud.
-  2. Unless Monaco duplicates the whole document into the textarea element, only a fraction of the content can be read before Narrator moves prematurely out of the document content and starts reading elsewhere on the page.
 
 ### Trouble Collaborating in Word Online while Composing Text
 [This video](https://www.youtube.com/watch?v=s7Ga2VYFiGo) shows a collaboration feature in Word Online where two users can see each other's edits and caret positions. Collaboration is suspended though while composition is in progress. When composition is active, updates to the view (especially nearby the composition) may cancel the composition and prevent text input.
@@ -255,6 +247,15 @@ The following table summarizes the difference between div with contentEditable a
 This [example](canvas_editContext.html) shows how an author can use EditContext to implement (IME) typing on a &lt;canvas&gt; element. ([demo video](EditContext_tpac2021.mp4))
 
 This [example](native_selection_demo.html) shows how an author can leverage native selection when using EditContext.
+
+## Accessibility
+
+As with custom editors created with hidden `contenteditable` or `<textarea>` elements,
+deliberate work is needed to make EditContext editors accessible to assistive technologies
+such as screen readers. This is especially true when attaching an EditContext to a `<canvas>`
+element, since text rendered to a canvas is not accessible to screen readers.
+For futher information about EditContext accessibility, see the
+[relevant section of the specification](https://w3c.github.io/edit-context/#accessibility).
 
 ## Interaction with Other Browser Editing Features
 By decoupling the view from text input, the EditContext opts out of some editing behaviors that are currently only available through the DOM. An inventory of those features and their interaction with the EditContext follows:
