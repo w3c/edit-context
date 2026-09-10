@@ -53,7 +53,9 @@
           , "geometry-1"
           , "uievents"
           , "infra"
-          , "input-events"]
+          , "input-events"
+          , "css-viewport"
+          , "css-values"]
         };
     </script>
 </head>
@@ -139,13 +141,10 @@
               [=Control bounds=], [=selection bounds=], and [=codepoint rects=] are given in the
               <dfn>client coordinate system</dfn>, which is defined as a two-dimensional Cartesian
               coordinate system (x, y) where the origin is the top-left corner of the
-              <a href="https://drafts.csswg.org/cssom-view/#layout-viewport">layout viewport</a>,
-              the x-axis points towards the top-right of the
-              <a href="https://drafts.csswg.org/cssom-view/#layout-viewport">layout viewport</a>,
-              and the y-axis points towards the bottom-left of the
-              <a href="https://drafts.csswg.org/cssom-view/#layout-viewport">layout viewport</a>.
-              The units of the client coordinate system are
-              <a href="https://drafts.csswg.org/css-values/#px">CSS pixels</a>.
+              [=layout viewport=], the x-axis points towards the top-right of the
+              [=layout viewport=], and the y-axis points towards the bottom-left of the
+              [=layout viewport=]. The units of the client coordinate system are
+              [=pixel unit|CSS pixels=].
             </p>
             <div class="note">
               <p>
