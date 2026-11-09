@@ -716,7 +716,7 @@ host.editContext = new EditContext();
 
 host.editContext.addEventListener('textupdate', e =&gt; {
     // Update alternative content text to match EditContext text.
-    alt.replaceData(e.updateRangeStart, e.updateRangeEnd, e.text);
+    alt.replaceData(e.updateRangeStart, e.updateRangeEnd - e.updateRangeStart, e.text);
     // Update alternative content selection to match EditContext selection.
     getSelection().setBaseAndExtent(
         alt, e.selectionStart,
