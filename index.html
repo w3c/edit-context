@@ -371,7 +371,7 @@
         render() {
             // render the text
             let canvasContext2D = this.canvas.getContext("2d");
-            canvasContext2D.strokeText(this.model.text);
+            canvasContext2D.strokeText(this.model.text, 0, 16);
 
             // render the selection (implementation omitted for brevity)
         } 
@@ -393,16 +393,16 @@
         }
 
         render() {
-            view.render()
+            this.view.render()
 
             // keep EditContext in sync, which essentially means
             // rendering the plain text view of the model.
-            let editContext = this.canvas.editContext  
-            this.editContext.updateText(0, this.model.text.length, this.model.text)
-            this.editContext.updateSelection(this.model.selectionStart, this.model.selectionEnd)
+            let editContext = this.editContext
+            editContext.updateText(0, editContext.text.length, this.model.text)
+            editContext.updateSelection(this.model.selectionStart, this.model.selectionEnd)
 
-            let selectionBounds = view.computeSelectionBound()  
-            let controlBounds = view.computeControlBound()  
+            let selectionBounds = this.view.computeSelectionBound()
+            let controlBounds = this.view.computeControlBound()
 
             // These bounds have x, y, width and height members  
             // so they can be assigned directly to EditContext.
