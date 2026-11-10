@@ -490,7 +490,7 @@
         }
 
         handleCharacterBoundsUpdate(rangeStart, rangeEnd) {
-            characterBounds = this.view.computeCharacterBounds(rangeStart, rangeEnd);
+            const characterBounds = this.view.computeCharacterBounds(rangeStart, rangeEnd);
             this.editContext.updateCharacterBounds(rangeStart, characterBounds);
         }
     }
@@ -505,14 +505,14 @@
     // EditContext will also receive textformatupdate event for IME decoration.
     // Ex. thin/thick underline for the "phrase mode" in Japanese IME.
     editContext.addEventListener("textformatupdate", e => {
-        editingcontroller.handleTextFormatUpdate(e.getTextFormats());
+        editingController.handleTextFormatUpdate(e.getTextFormats());
     });
 
     // When receiving CharacterBoundsUpdate event, the author is responsible to compute
     // the bounds of characters from rangeStart to rangeEnd, and call
     // EditContext.updateCharacterBounds to update the character bounds in EditContext.
     editContext.addEventListener("characterboundsupdate", e => {
-        editingcontroller.handleCharacterBoundsUpdate(e.rangeStart, e.rangeEnd);
+        editingController.handleCharacterBoundsUpdate(e.rangeStart, e.rangeEnd);
     });
 &lt;/script&gt;</pre>
                 </aside>
